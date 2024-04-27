@@ -3,7 +3,7 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   background-color: #F9F6EE;
-  color: #1c1d1d;
+  color: #4c4841;
   font-family: monospace
 }
 
@@ -59,12 +59,12 @@ article ul {
 
 a {
   font-weight: bold;
-  color: #323232;
+  color: #927e5f;
   text-decoration: underline;
 }
 
 a:visited {
-  color: #838383;
+  color: #5f5c56;
 }
 
 canvas {
@@ -74,4 +74,45 @@ canvas {
   right: 0;
   bottom: 0;
   z-index: 1;
+}
+
+
+
+/**
+ * Fish handling 
+ */
+
+#fish {
+  position: fixed;
+}
+
+@keyframes exclamation-appear {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  30% {
+    transform: scale(1.2) rotate(20deg);
+  }
+  40% {
+    transform: scale(1.0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+#exclamation {
+  animation: exclamation-appear 1s forwards;
+  font-size: 24px;
+  font-weight: bold;
+  color: red;
+  position: fixed;
+  opacity: 0;
+  top: 0;
+  left: 0;
 }

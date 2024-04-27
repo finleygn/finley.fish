@@ -1,9 +1,26 @@
 import default_vertex_shader_src from './shader/default.vert.glsl?raw';
 import bricks_frag_shader_src from './shader/bricks.frag.glsl?raw';
+import Fish from './fish/Fish';
 
+
+/**
+ * Fish setup
+ */
+
+const fishElement = document.getElementById('fish');
+
+if (!fishElement) {
+  throw new Error("No fish element found.");
+}
+
+const fish = new Fish(fishElement);
+
+/**
+ * Background stuffs
+ */
 const canvas = <HTMLCanvasElement>document.getElementById('canvas');
 
-if (!canvas) throw new Error("No canvas found, shit yourself.");
+if (!canvas) throw new Error("No canvas found.");
 
 const gl = canvas.getContext('webgl2');
 
@@ -82,7 +99,20 @@ const time0 = (new Date()).getTime();
 const timeLocation = gl.getUniformLocation(program, "u_time");
 const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
 
+gl.useProgram(program);
+gl.bindVertexArray(vao);
+
+
+/**
+ * Canvas & Fish Updates...
+ */
+let lastFrameTime = Date.now();
+
 const resizeAndDraw = () => {
+  const currentTime = Date.now()
+  let dt = currentTime - lastFrameTime;
+  lastFrameTime = currentTime;
+
   const dpr = window.devicePixelRatio;
   const { width, height } = canvas.getBoundingClientRect();
   const displayWidth = Math.round(width * dpr);
@@ -105,11 +135,11 @@ const resizeAndDraw = () => {
   // RUN HERE
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 
+  fish.frame(dt);
+
   requestAnimationFrame(resizeAndDraw);
 };
 
-gl.useProgram(program);
-gl.bindVertexArray(vao);
 
 resizeAndDraw();
 window.addEventListener('resize', resizeAndDraw);
