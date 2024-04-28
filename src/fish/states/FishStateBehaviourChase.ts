@@ -23,7 +23,7 @@ class FishStateBehaviourChase implements IFishStateBehaviour {
     const swimStrength = (Math.sin(this.elapsed * 0.002) + 1.0) * 0.5;
     this.elapsed += dt;
 
-    if (this.mousePositionTracker.position.subtract(fish.getPosition()).magnitude() < 20) {
+    if (this.mousePositionTracker.position.subtract(fish.getPosition()).magnitude() < 10) {
       fish.setState(FishState.NIBBLING);
     } else {
       fish.setPosition(

@@ -5,17 +5,21 @@ import IFishStateBehaviour from "./IFishStateBehaviour";
 
 class FishStateBehaviourNibble implements IFishStateBehaviour {
   private mousePositionTracker: MousePositionTracker;
+  private elapsedTime: number = 0;
 
   constructor(mousePositionTracker: MousePositionTracker) {
     this.mousePositionTracker = mousePositionTracker;
   }
 
-  public frame(_: number, fish: Fish) {
+  public frame(dt: number, fish: Fish) {
     const direction = new Vector2(0.5, -0.2).normalize();
 
     fish.setDirection(direction);
+    this.elapsedTime += dt;
 
-    if (this.mousePositionTracker.position.subtract(fish.getPosition()).magnitude() > 20) {
+    if (
+      this.mousePositionTracker.position.subtract(fish.getPosition()).magnitude() > 60 && this.elapsedTime > 100
+    ) {
       fish.setState(FishState.CHASE);
     } else {
       fish.setPosition(this.mousePositionTracker.position.add(new Vector2(-12, 5)));
