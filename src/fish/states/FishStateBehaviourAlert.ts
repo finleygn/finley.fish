@@ -4,23 +4,27 @@ import IFishStateBehaviour from "./IFishStateBehaviour";
 
 class FishStateBehaviourAlert implements IFishStateBehaviour {
   private timeout?: ReturnType<typeof setTimeout>;
-  private CHASE_TIMEOUT_MS = 500;
+  private static BEGIN_CHASE_TIMEOUT_MS = 500;
 
   private exclamations: HTMLSpanElement[] = [];
-  private mousePositionTracker: MousePositionTracker = new MousePositionTracker();
+  private mouse: MousePositionTracker = new MousePositionTracker();
 
-  constructor(fish: Fish, mousePositionTracker: MousePositionTracker) {
+  constructor(fish: Fish, mouse: MousePositionTracker) {
+    this.mouse = mouse;
+
     const { x, y } = fish.getPosition();
-
-    this.mousePositionTracker = mousePositionTracker;
-
-    this.exclamations.push(
-      this.createExclamationElement([x - 0, y - 40], 0, "20px"),
-    );
+    this.exclamations.push(this.createExclamationElement([x - 0, y - 40], 0, "20px"),);
 
     this.timeout = setTimeout(() => {
       fish.setState(FishState.CHASE);
-    }, this.CHASE_TIMEOUT_MS)
+    }, FishStateBehaviourAlert.BEGIN_CHASE_TIMEOUT_MS)
+  }
+
+  public frame(_: number, fish: Fish) {
+    const direction = this.mouse.position.direction(fish.getPosition());
+
+    fish.setVelocity(direction);
+    fish.setDirection(direction);
   }
 
   public cleanup(): void {
@@ -28,14 +32,6 @@ class FishStateBehaviourAlert implements IFishStateBehaviour {
       exclamation.remove();
     }
     clearTimeout(this.timeout);
-  }
-
-  public frame(_: number, fish: Fish) {
-    const direction = this.mousePositionTracker.position
-      .subtract(fish.getPosition())
-      .normalize();
-
-    fish.setDirection(direction);
   }
 
   private createExclamationElement(

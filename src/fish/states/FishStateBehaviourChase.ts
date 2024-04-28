@@ -1,4 +1,4 @@
-import Fish, { FishState } from "../Fish";
+import Fish from "../Fish";
 import MousePositionTracker from "../MousePosition";
 import Vector2 from "../Vector2";
 import IFishStateBehaviour from "./IFishStateBehaviour";
@@ -14,32 +14,17 @@ class FishStateBehaviourChase implements IFishStateBehaviour {
   }
 
   public frame(dt: number, fish: Fish) {
-    const direction = this.lastMousePosition
-      .subtract(fish.getPosition())
-      .normalize();
+    fish.setDirection(this.lastMousePosition.direction(fish.getPosition()));
 
-    fish.setDirection(direction);
-
-    const swimStrength = (Math.sin(this.elapsed * 0.002) + 1.0) * 0.5;
-    this.elapsed += dt;
-
-    const mouseToFishDistance = this.mouse.position.distance(fish.getPosition());
-
-    if (mouseToFishDistance < 10) {
-      fish.setState(FishState.NIBBLING);
-      return;
+    if (this.mouse.position.distance(fish.getPosition()) < 10) {
+      fish.setVelocity(fish.getVelocity().multiply(-1));
     }
 
-    fish.setPosition(
-      fish.getPosition()
-        .add(
-          direction
-            .multiply(dt * 0.4)
-            .multiply(0.2 + 0.5 * swimStrength)
-        )
-    );
+    const swimStrength = (Math.sin(this.elapsed * 0.005) + 1.0) * 0.5;
+    fish.setSpeed(1.0 + 0.5 * swimStrength);
 
     this.lastMousePosition = this.lastMousePosition.lerp(this.mouse.position, 0.05);
+    this.elapsed += dt;
   }
 
 }

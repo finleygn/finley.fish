@@ -9,6 +9,10 @@ class Vector2 {
     this.y = y;
   }
 
+  public direction(other: Vector2) {
+    return this.subtract(other).normalize();
+  }
+
   public distance(other: Vector2) {
     return this.subtract(other).magnitude();
   }
