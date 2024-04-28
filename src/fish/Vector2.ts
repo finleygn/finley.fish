@@ -1,3 +1,5 @@
+import { lerp } from "./math";
+
 class Vector2 {
   public x: number;
   public y: number;
@@ -23,7 +25,7 @@ class Vector2 {
     return new Vector2(this.x + other.x, this.y + other.y);
   }
 
-  public normalize() {
+  public normalize(): Vector2 {
     const magnitude = this.magnitude();
     return Vector2.from(this).divide(magnitude);
   }
@@ -38,6 +40,10 @@ class Vector2 {
 
   public det(other: Vector2): number {
     return this.x * other.y - this.y * other.x;
+  }
+
+  public lerp(other: Vector2, t: number): Vector2 {
+    return new Vector2(lerp(this.x, other.x, t), lerp(this.y, other.y, t));
   }
 
   static from(vector: Vector2): Vector2 {

@@ -19,9 +19,6 @@ class FishStateBehaviourIdle implements IFishStateBehaviour {
       fish.setState(FishState.ALERT);
     }
   }
-
-  public cleanup(): void {
-  }
 }
 
 export default FishStateBehaviourIdle;

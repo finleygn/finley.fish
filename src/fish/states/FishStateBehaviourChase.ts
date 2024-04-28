@@ -1,34 +1,41 @@
 import Fish, { FishState } from "../Fish";
 import MousePositionTracker from "../MousePosition";
+import Vector2 from "../Vector2";
 import IFishStateBehaviour from "./IFishStateBehaviour";
 
 class FishStateBehaviourChase implements IFishStateBehaviour {
   private elapsed = 0;
   private mousePositionTracker: MousePositionTracker;
+  private lastKnownMousePosition: Vector2;
 
   constructor(mousePositionTracker: MousePositionTracker) {
     this.mousePositionTracker = mousePositionTracker;
-  }
-
-  public cleanup(): void {
-
+    this.lastKnownMousePosition = mousePositionTracker.position;
   }
 
   public frame(dt: number, fish: Fish) {
-    const distance = this.mousePositionTracker.position.subtract(fish.getPosition())
-    const direction = distance.normalize();
+    const direction = this.lastKnownMousePosition
+      .subtract(fish.getPosition())
+      .normalize();
 
     fish.setDirection(direction);
 
-    fish.setPosition(
-      fish.getPosition().add(direction.multiply(dt).multiply(0.1))
-    );
-
+    const swimStrength = (Math.sin(this.elapsed * 0.002) + 1.0) * 0.5;
     this.elapsed += dt;
 
-    if (distance.magnitude() < 50) {
-      fish.setState(FishState.IDLE);
+    if (this.mousePositionTracker.position.subtract(fish.getPosition()).magnitude() < 20) {
+      fish.setState(FishState.NIBBLING);
+    } else {
+      fish.setPosition(
+        fish.getPosition()
+          .add(
+            direction
+              .multiply(dt * 0.4)
+              .multiply(0.2 + 0.5 * swimStrength)
+          )
+      );
     }
+    this.lastKnownMousePosition = this.lastKnownMousePosition.lerp(this.mousePositionTracker.position, 0.05);
   }
 
 }

@@ -84,6 +84,13 @@ canvas {
 
 #fish {
   position: fixed;
+  width: 20px;
+  height: 26px;
+  pointer-events: none;
+}
+
+#fish-icon {
+  position: absolute;
 }
 
 @keyframes exclamation-appear {

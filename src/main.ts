@@ -8,12 +8,13 @@ import Fish from './fish/Fish';
  */
 
 const fishElement = document.getElementById('fish');
+const fishIconElement = document.getElementById('fish-icon');
 
-if (!fishElement) {
+if (!fishElement || !fishIconElement) {
   throw new Error("No fish element found.");
 }
 
-const fish = new Fish(fishElement);
+const fish = new Fish(fishElement, fishIconElement);
 
 /**
  * Background stuffs
