@@ -5,16 +5,16 @@ import IFishStateBehaviour from "./IFishStateBehaviour";
 
 class FishStateBehaviourChase implements IFishStateBehaviour {
   private elapsed = 0;
-  private mousePositionTracker: MousePositionTracker;
-  private lastKnownMousePosition: Vector2;
+  private mouse: MousePositionTracker;
+  private lastMousePosition: Vector2;
 
-  constructor(mousePositionTracker: MousePositionTracker) {
-    this.mousePositionTracker = mousePositionTracker;
-    this.lastKnownMousePosition = mousePositionTracker.position;
+  constructor(mouse: MousePositionTracker) {
+    this.mouse = mouse;
+    this.lastMousePosition = mouse.position;
   }
 
   public frame(dt: number, fish: Fish) {
-    const direction = this.lastKnownMousePosition
+    const direction = this.lastMousePosition
       .subtract(fish.getPosition())
       .normalize();
 
@@ -23,19 +23,23 @@ class FishStateBehaviourChase implements IFishStateBehaviour {
     const swimStrength = (Math.sin(this.elapsed * 0.002) + 1.0) * 0.5;
     this.elapsed += dt;
 
-    if (this.mousePositionTracker.position.subtract(fish.getPosition()).magnitude() < 10) {
+    const mouseToFishDistance = this.mouse.position.distance(fish.getPosition());
+
+    if (mouseToFishDistance < 10) {
       fish.setState(FishState.NIBBLING);
-    } else {
-      fish.setPosition(
-        fish.getPosition()
-          .add(
-            direction
-              .multiply(dt * 0.4)
-              .multiply(0.2 + 0.5 * swimStrength)
-          )
-      );
+      return;
     }
-    this.lastKnownMousePosition = this.lastKnownMousePosition.lerp(this.mousePositionTracker.position, 0.05);
+
+    fish.setPosition(
+      fish.getPosition()
+        .add(
+          direction
+            .multiply(dt * 0.4)
+            .multiply(0.2 + 0.5 * swimStrength)
+        )
+    );
+
+    this.lastMousePosition = this.lastMousePosition.lerp(this.mouse.position, 0.05);
   }
 
 }

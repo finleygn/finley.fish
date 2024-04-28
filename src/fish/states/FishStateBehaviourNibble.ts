@@ -4,11 +4,11 @@ import Vector2 from "../Vector2";
 import IFishStateBehaviour from "./IFishStateBehaviour";
 
 class FishStateBehaviourNibble implements IFishStateBehaviour {
-  private mousePositionTracker: MousePositionTracker;
+  private mouse: MousePositionTracker;
   private elapsedTime: number = 0;
 
-  constructor(mousePositionTracker: MousePositionTracker) {
-    this.mousePositionTracker = mousePositionTracker;
+  constructor(mouse: MousePositionTracker) {
+    this.mouse = mouse;
   }
 
   public frame(dt: number, fish: Fish) {
@@ -18,11 +18,11 @@ class FishStateBehaviourNibble implements IFishStateBehaviour {
     this.elapsedTime += dt;
 
     if (
-      this.mousePositionTracker.position.subtract(fish.getPosition()).magnitude() > 60 && this.elapsedTime > 100
+      this.mouse.position.distance(fish.getPosition()) > 60 && this.elapsedTime > 100
     ) {
       fish.setState(FishState.CHASE);
     } else {
-      fish.setPosition(this.mousePositionTracker.position.add(new Vector2(-12, 5)));
+      fish.setPosition(this.mouse.position.add(new Vector2(-12, 5)));
     }
   }
 }

@@ -9,6 +9,10 @@ class Vector2 {
     this.y = y;
   }
 
+  public distance(other: Vector2) {
+    return this.subtract(other).magnitude();
+  }
+
   public subtract(other: Vector2) {
     return new Vector2(this.x - other.x, this.y - other.y);
   }

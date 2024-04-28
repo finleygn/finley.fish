@@ -3,14 +3,14 @@ import MousePositionTracker from "../MousePosition";
 import IFishStateBehaviour from "./IFishStateBehaviour";
 
 class FishStateBehaviourIdle implements IFishStateBehaviour {
-  private mousePositionTracker: MousePositionTracker;
+  private mouse: MousePositionTracker;
 
-  constructor(mousePositionTracker: MousePositionTracker) {
-    this.mousePositionTracker = mousePositionTracker;
+  constructor(mouse: MousePositionTracker) {
+    this.mouse = mouse;
   }
 
   public frame(_: number, fish: Fish) {
-    const distance = this.mousePositionTracker.position.subtract(fish.getPosition())
+    const distance = this.mouse.position.subtract(fish.getPosition());
 
     if (distance.magnitude() < 50) {
       const direction = distance.normalize();
