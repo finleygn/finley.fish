@@ -182,7 +182,7 @@ const resizeAndDraw = () => {
     const windowAddFishButtonPosition = new Vector2(left + width * 0.5, top + height * 0.5);
 
 
-    if (windowFishPosition.distance(windowAddFishButtonPosition) > 50 && originalFish.state !== FishState.IDLE) {
+    if (windowFishPosition.distance(windowAddFishButtonPosition) > 100 && originalFish.state !== FishState.IDLE) {
       addFishButton.style.visibility = "visible"
       addFishButton.classList.add("add-fish--visible");
     }

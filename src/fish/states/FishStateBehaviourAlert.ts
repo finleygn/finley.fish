@@ -12,8 +12,7 @@ class FishStateBehaviourAlert implements IFishStateBehaviour {
   constructor(fish: Fish, mouse: MousePositionTracker) {
     this.mouse = mouse;
 
-    const { x, y } = fish.getPosition();
-    this.exclamations.push(this.createExclamationElement([x - 0, y - 40], 0, "20px"),);
+    this.exclamations.push(this.createExclamationElement(fish, [10, -20], 0, "20px"),);
 
     this.timeout = setTimeout(() => {
       fish.setState(FishState.CHASE);
@@ -21,10 +20,11 @@ class FishStateBehaviourAlert implements IFishStateBehaviour {
   }
 
   public frame(_: number, fish: Fish) {
-    const direction = this.mouse.position.direction(fish.getPosition());
+    const movementDirection = this.mouse.position.direction(fish.getPosition()).multiply(-1)
+    fish.setDirection(movementDirection);
+    fish.setVelocity(movementDirection);
 
-    fish.setVelocity(direction);
-    fish.setDirection(direction);
+    fish.setSpeed(1.0);
   }
 
   public cleanup(): void {
@@ -35,6 +35,7 @@ class FishStateBehaviourAlert implements IFishStateBehaviour {
   }
 
   private createExclamationElement(
+    fish: Fish,
     position: [number, number],
     delay: number,
     size: string
@@ -46,7 +47,7 @@ class FishStateBehaviourAlert implements IFishStateBehaviour {
     element.style.animationDelay = `${delay}ms`;
     element.style.fontSize = size;
     element.innerHTML = "!"
-    document.body.appendChild(element)
+    fish.containerElement.appendChild(element)
     return element;
   }
 }

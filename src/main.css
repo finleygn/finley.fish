@@ -176,7 +176,7 @@ canvas {
   font-size: 24px;
   font-weight: bold;
   color: red;
-  position: fixed;
+  position: absolute;
   opacity: 0;
   top: 0;
   left: 0;

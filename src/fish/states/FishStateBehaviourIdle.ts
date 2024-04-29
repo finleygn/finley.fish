@@ -20,7 +20,7 @@ class FishStateBehaviourIdle implements IFishStateBehaviour {
 
     const distance = this.mouse.position.subtract(fish.getPosition());
 
-    if (distance.magnitude() < 50) {
+    if (distance.magnitude() < 20) {
       const direction = distance.normalize();
 
       fish.setDirection(direction);

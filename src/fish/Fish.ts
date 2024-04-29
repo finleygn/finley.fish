@@ -13,7 +13,7 @@ export enum FishState {
 }
 
 class Fish {
-  private containerElement: HTMLElement;
+  public containerElement: HTMLElement;
   private iconElement: HTMLElement;
   private mouse: MousePositionTracker;
 
