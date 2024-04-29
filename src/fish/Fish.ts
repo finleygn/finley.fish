@@ -1,10 +1,10 @@
 import IFishStateBehaviour from "./states/IFishStateBehaviour";
 import FishStateBehaviourAlert from "./states/FishStateBehaviourAlert";
 import FishStateBehaviourIdle from "./states/FishStateBehaviourIdle";
-import Vector2 from "./Vector2";
+import Vector2 from "../util/Vector2";
 import FishStateBehaviourChase from "./states/FishStateBehaviourChase";
-import MousePositionTracker from "./MousePosition";
-import { cubicPulse } from "./math";
+import MousePositionTracker from "../util/MousePosition";
+import { cubicPulse } from "../util/math";
 
 export enum FishState {
   IDLE,

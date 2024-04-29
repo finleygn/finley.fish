@@ -1,5 +1,5 @@
 import Fish, { FishState } from "../Fish";
-import MousePositionTracker from "../MousePosition";
+import MousePositionTracker from "../../util/MousePosition";
 import IFishStateBehaviour from "./IFishStateBehaviour";
 
 class FishStateBehaviourAlert implements IFishStateBehaviour {

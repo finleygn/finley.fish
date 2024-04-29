@@ -1,6 +1,6 @@
 import Fish from "../Fish";
-import MousePositionTracker from "../MousePosition";
-import Vector2 from "../Vector2";
+import MousePositionTracker from "../../util/MousePosition";
+import Vector2 from "../../util/Vector2";
 import IFishStateBehaviour from "./IFishStateBehaviour";
 
 class FishStateBehaviourChase implements IFishStateBehaviour {

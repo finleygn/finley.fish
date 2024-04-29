@@ -1,8 +1,9 @@
 import default_vertex_shader_src from './shader/default.vert.glsl?raw';
 import bricks_frag_shader_src from './shader/bricks.frag.glsl?raw';
 import Fish, { FishState } from './fish/Fish';
-import Vector2 from './fish/Vector2';
-import MousePositionTracker from './fish/MousePosition';
+import Vector2 from './util/Vector2';
+import MousePositionTracker from './util/MousePosition';
+import './main.css';
 
 const mouseTracker = new MousePositionTracker();
 
