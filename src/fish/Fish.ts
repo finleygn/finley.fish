@@ -15,28 +15,28 @@ export enum FishState {
 class Fish {
   private containerElement: HTMLElement;
   private iconElement: HTMLElement;
-
-  private state: IFishStateBehaviour;
   private mouse: MousePositionTracker;
 
-  private base_direction: Vector2 = new Vector2(-1, 0);
-  private direction: Vector2 = this.base_direction;
+  private baseDirection: Vector2 = new Vector2(-1, 0);
 
-  private size: Vector2;
-  private position: Vector2;
+  private stateBehaviour: IFishStateBehaviour;
+  public state: FishState;
+
+  public direction: Vector2 = this.baseDirection;
+  public size: Vector2;
+  public position: Vector2;
   // Should probably just make velocity and speed one thing...
-  private velocity: Vector2 = this.base_direction;
-  private speed: number;
-
-  private stateChangeListener?: (state: FishState) => void;
-
+  public velocity: Vector2 = this.baseDirection;
+  public speed: number;
 
   constructor(containerElement: HTMLElement, iconElement: HTMLElement, mousePositionTracker: MousePositionTracker) {
     this.containerElement = containerElement;
     this.iconElement = iconElement;
     this.mouse = mousePositionTracker;
 
-    this.state = this.stateBehaviourFactory(FishState.IDLE);
+    this.state = FishState.IDLE;
+    this.stateBehaviour = this.stateBehaviourFactory(this.state);
+
     this.position = this.getInitialPosition();
     this.size = this.getInitialSize();
     this.speed = 0;
@@ -49,7 +49,8 @@ class Fish {
    */
   public frame(dt: number, fish: Fish[]) {
     this.setPosition(this.position.add(this.velocity.multiply(this.speed * dt)));
-    this.state.frame?.(dt, this);
+
+    this.stateBehaviour.frame?.(dt, this);
 
     this.velocity = this.velocity.lerp(this.direction, 0.01);
 
@@ -69,13 +70,9 @@ class Fish {
    * State machine stuff
    */
   public setState(state: FishState) {
-    this.state.cleanup?.(this);
-    this.state = this.stateBehaviourFactory(state);
-    this.stateChangeListener?.(state);
-  }
-
-  public onStateChange(listener?: (state: FishState) => void) {
-    this.stateChangeListener = listener;
+    this.stateBehaviour.cleanup?.(this);
+    this.state = state;
+    this.stateBehaviour = this.stateBehaviourFactory(state);
   }
 
   private stateBehaviourFactory(state: FishState) {
@@ -120,7 +117,7 @@ class Fish {
     this.direction = direction;
 
     // We need to get the angle from -1,0 (base direction) to the given direction
-    const angle = Math.atan2(this.base_direction.det(this.direction), this.base_direction.dot(this.direction));
+    const angle = Math.atan2(this.baseDirection.det(this.direction), this.baseDirection.dot(this.direction));
 
     if (direction.x > 0) {
       this.iconElement.style.transform = `scaleX(-1) rotate(calc(180deg - ${angle}rad))`;

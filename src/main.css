@@ -134,17 +134,21 @@ canvas {
   }
 }
 
-#add-fish {
+.add-fish {
   border: 1px solid #5f5c56;
   border-radius: 3px;
   background: #927e5f;
   color: white;
   cursor: pointer;
-  display: none;
+  visibility: hidden;
   opacity: 0;
-  animation: button-appear 0.5s forwards;
   font-size: 12px;
+  margin-left: -10px;
   font-family: monospace;
+}
+
+.add-fish--visible {
+  animation: button-appear 0.5s forwards;
 }
 
 @keyframes exclamation-appear {

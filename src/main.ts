@@ -12,14 +12,14 @@ const mouseTracker = new MousePositionTracker();
  */
 const fishElement = <HTMLSpanElement>document.getElementsByClassName('fish')[0];
 const fishIconElement = <HTMLSpanElement>document.getElementsByClassName('fish-icon')[0];
-const addFishButton = <HTMLButtonElement>document.getElementById('add-fish');
+const addFishButton = <HTMLButtonElement>document.getElementsByClassName('add-fish')[0];
 
 if (!fishElement || !fishIconElement || !addFishButton) {
   throw new Error("No fish element found.");
 }
 
 const originalFish = new Fish(fishElement, fishIconElement, mouseTracker);
-const fish = [originalFish];
+const fishSchool = [originalFish];
 
 addFishButton.onclick = (event) => {
   /**
@@ -46,16 +46,8 @@ addFishButton.onclick = (event) => {
   newFish.setDirection(lookDirection);
   newFish.setVelocity(lookDirection);
   newFish.setState(FishState.CHASE);
-  fish.push(newFish); // Add to the school c:
+  fishSchool.push(newFish); // Add to the school c:
 }
-
-originalFish.onStateChange((state) => {
-  if (state === FishState.ALERT) {
-    setTimeout(() => {
-      addFishButton.style.display = "block";
-    }, 1000);
-  }
-})
 
 /**
  * Background stuffs
@@ -174,8 +166,21 @@ const resizeAndDraw = () => {
   // RUN HERE
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-  for (const fishie of fish) {
-    fishie.frame(dt, fish);
+  for (const fishie of fishSchool) {
+    fishie.frame(dt, fishSchool);
+  }
+
+  if (addFishButton.style.visibility !== "hidden") {
+    const fishPosition = originalFish.getPosition();
+    const { top, left, width, height } = addFishButton.getBoundingClientRect();
+    const windowFishPosition = new Vector2(fishPosition.x, fishPosition.y);
+    const windowAddFishButtonPosition = new Vector2(left + width * 0.5, top + height * 0.5);
+
+
+    if (windowFishPosition.distance(windowAddFishButtonPosition) > 50 && originalFish.state !== FishState.IDLE) {
+      addFishButton.style.visibility = "visible"
+      addFishButton.classList.add("add-fish--visible");
+    }
   }
 
   requestAnimationFrame(resizeAndDraw);
