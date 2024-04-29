@@ -138,10 +138,15 @@ gl.bindVertexArray(vao);
  * Canvas & Fish Updates...
  */
 let lastFrameTime = Date.now();
+const longestFrame = 50;
 
 const resizeAndDraw = () => {
-  const currentTime = Date.now()
+  requestAnimationFrame(resizeAndDraw);
+
+  const currentTime = Date.now();
   let dt = currentTime - lastFrameTime;
+  if (dt > longestFrame) dt = longestFrame;
+
   lastFrameTime = currentTime;
 
   const dpr = window.devicePixelRatio;
@@ -182,8 +187,6 @@ const resizeAndDraw = () => {
       addFishButton.classList.add("add-fish--visible");
     }
   }
-
-  requestAnimationFrame(resizeAndDraw);
 };
 
 
