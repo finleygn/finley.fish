@@ -17,7 +17,15 @@ class FishStateBehaviourChase implements IFishStateBehaviour {
     fish.setDirection(this.lastMousePosition.direction(fish.getPosition()));
 
     if (this.mouse.position.distance(fish.getPosition()) < 12) {
-      fish.setVelocity(fish.getVelocity().multiply(-1));
+      // Lets use the opposite of current velocity
+      let oppositeVelocity = fish.getVelocity().multiply(-1);
+
+      // Unless its below a certain value, then force it to be a a vector of at least mag 0.5
+      if (oppositeVelocity.magnitude() < 0.5) {
+        oppositeVelocity = fish.getDirection().multiply(-1 * 0.5);
+      }
+
+      fish.setVelocity(oppositeVelocity);
     }
 
     const swimStrength = (Math.sin(this.elapsed * 0.005) + 1.0) * 0.5;
