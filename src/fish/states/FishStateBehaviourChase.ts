@@ -16,7 +16,7 @@ class FishStateBehaviourChase implements IFishStateBehaviour {
   public frame(dt: number, fish: Fish) {
     fish.setDirection(this.lastMousePosition.direction(fish.getPosition()));
 
-    if (this.mouse.position.distance(fish.getPosition()) < 10) {
+    if (this.mouse.position.distance(fish.getPosition()) < 12) {
       fish.setVelocity(fish.getVelocity().multiply(-1));
     }
 
