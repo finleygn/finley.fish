@@ -120,9 +120,9 @@ class Fish {
     const angle = Math.atan2(this.baseDirection.det(this.direction), this.baseDirection.dot(this.direction));
 
     if (direction.x > 0) {
-      this.iconElement.style.transform = `scaleX(-1) rotate(calc(180deg - ${angle}rad))`;
+      this.iconElement.style.transform = `scaleX(1) rotate(calc(180deg + ${angle}rad))`;
     } else {
-      this.iconElement.style.transform = `scaleX(1) rotate(${angle}rad) `;
+      this.iconElement.style.transform = `scaleX(-1) rotate(${-angle}rad) `;
     }
   }
 

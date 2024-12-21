@@ -53,19 +53,21 @@ header {
 header h1 {
   font-size: 26px;
   line-height: 1;
+  padding-right: 8px;
 }
 
 article h2 {
-  font-size: 14px;
+  font-size: 15px;
   font-family: monospace;
   margin: 0;
+  height: 18px;
 }
 
 article hr {
   margin-top: 8px;
   border: none;
   height: 1px;
-  background: #000;
+  background: #4c4841;
 }
 
 article p,
@@ -106,16 +108,16 @@ canvas {
 
 .fish {
   position: fixed;
-  width: 20px;
-  height: 26px;
-  font-size: 26px;
   pointer-events: none;
   z-index: 999;
+  width: 30px;
+  height: 26px;
 }
 
 .fish-icon {
   position: absolute;
-  line-height: 26px;
+  width: 30px;
+  height: 26px;
 }
 
 @keyframes button-appear {

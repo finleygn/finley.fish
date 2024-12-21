@@ -26,9 +26,10 @@ addFishButton.onclick = (event) => {
    * Create Fish Element
    */
   const newFishContainer = document.createElement('span');
-  const newFishIcon = document.createElement('span');
+  const newFishIcon = document.createElement('img');
   newFishContainer.className = 'fish';
   newFishIcon.className = 'fish-icon';
+  newFishIcon.src = "/fish.svg";
   newFishContainer.style.top = `${Math.random() * window.innerHeight}px`;
   newFishContainer.style.left = `${Math.random() * window.innerWidth}px`;
 
@@ -88,8 +89,6 @@ function createProgram(gl: WebGL2RenderingContext, vertexShader: WebGLShader, fr
   gl.deleteProgram(program);
   throw new Error();
 }
-
-
 
 const vertexShader = createShader(gl, gl.VERTEX_SHADER, default_vertex_shader_src);
 const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, bricks_frag_shader_src);
@@ -168,7 +167,6 @@ const resizeAndDraw = () => {
   gl.uniform1f(timeLocation, (new Date()).getTime() - time0);
   gl.uniform2fv(resolutionLocation, [canvas.width, canvas.height]);
 
-  // RUN HERE
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 
   for (const fishie of fishSchool) {
@@ -182,7 +180,7 @@ const resizeAndDraw = () => {
     const windowAddFishButtonPosition = new Vector2(left + width * 0.5, top + height * 0.5);
 
 
-    if (windowFishPosition.distance(windowAddFishButtonPosition) > 100 && originalFish.state !== FishState.IDLE) {
+    if (windowFishPosition.distance(windowAddFishButtonPosition) > 70 && originalFish.state !== FishState.IDLE) {
       addFishButton.style.visibility = "visible"
       addFishButton.classList.add("add-fish--visible");
     }
