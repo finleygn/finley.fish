@@ -7,95 +7,56 @@ out vec4 outColor;
 uniform float u_time;
 uniform vec2 u_resolution;
 
-float random(in vec2 st){return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453);}
 
-float aastep(float threshold,float value){
-  float afwidth=.7*length(vec2(dFdx(value),dFdy(value)));
-  return smoothstep(threshold-afwidth,threshold+afwidth,value);
+float PI = 3.141f;
+
+vec3 rgb(float r, float g, float b) {
+  float fr = 1.0 / 255.0;
+  return vec3(fr * r, fr * g, fr * b);
 }
 
-float rectSDF(in vec2 st,in vec2 s){
-  st=st*2.-1.;
-  return max(abs(st.x/s.x),abs(st.y/s.y));
-}
-
-float fill(float x,float size){
-  return 1.-step(size,x);
-}
-
-float rect(vec2 st,vec2 size){
-  return fill(rectSDF(st,size),1.);
-}
-
-float cross_shape(in vec2 st,in vec4 size,in vec2 width){
-  return clamp(
-    rect(st-vec2(size.x*.5,0.),vec2(size.x,width.x))+
-    rect(st+vec2(size.z*.5,0.),vec2(size.z,width.x))+
-    rect(st-vec2(0.,size.y*.5),vec2(width.y,size.y))+
-    rect(st+vec2(0.,size.w*.5),vec2(width.y,size.w)),
-    0.,
-    1.
+// Inspo ~ (stolen) https://www.shadertoy.com/view/M3XSDn
+vec2 hash2(vec2 p) {
+  p = vec2(
+    dot(p, vec2(127.1f, 311.7f)), 
+    dot(p, vec2(269.5f, 183.3f))
   );
+  return fract(sin(p) * 43758.5453f);
 }
 
-vec4 remove_one(in vec2 st){
-  float rand=random(st);
-  if(rand>.75){
-    return vec4(0.,1.,1.,1.);
+float voronoi(in vec2 uv, float smoothness) {
+  vec2 n = floor(uv);
+  vec2 f = fract(uv);
+
+  float m = 8.0f;
+
+  for(float j = -2.0f; j <= 2.0f; j++) {
+    for(float i = -2.0f; i <= 2.0f; i++) {
+      vec2 g = vec2(i, j);
+      vec2 o = hash2(n + g);
+
+      o = 0.3f * sin(u_time*0.0005 + 2.0f * PI * o + uv);
+      float mag = length(g - f + o);
+      float h = clamp(0.5f + 0.5f * (m - mag) / smoothness, 0.0f, 1.0f);
+      m = mix(m, mag, h) - h * (1.0f - h) * smoothness;
+    }
   }
-  if(rand>.50){
-    return vec4(1.,0.,1.,1.);
-  }
-  if(rand>.25){
-    return vec4(1.,1.,0.,1.);
-  }
-  return vec4(1.,1.,1.,0.);
+
+  return m;
 }
 
-float section_length(in vec2 quadrant){
-  return 1.;
-}
+void main() {
+  vec2 R = u_resolution.xy;
+  vec2 uv = (2.0 * (v_position.xy*R) - R) / min(R.x, R.y);
+  uv *= 0.4;
+  uv.y += u_time * 0.0001;
+  uv.x += u_time * 0.00004;
+  
+  float vNoise = voronoi(uv, 0.001);
+  float sNoise = voronoi(uv, 0.5);
+  float fVoronoi = smoothstep(0.0, 0.02, vNoise-sNoise-0.08);
 
-void main(){
-  // Move coordinates from -1->1 to 0->1
-  vec2 shifted_position=(v_position.xy+1.)*.5;
-  vec2 position=shifted_position;
-  
-  // Scaling function for x repetition - reduces for mobile viewports
-  float x_base_repeat=pow(u_resolution.x*.09,.5);
-  // Scaling function for y repetition - just to be consistent with x i guess
-  float y_base_repeat=pow(u_resolution.y*.01,.5);
-  
-  // warping
-  float x_repeat=x_base_repeat*pow(position.y,.2);
-  float y_repeat=y_base_repeat;
-  
-  // width & height for lines
-  vec2 pixel_size=(1./u_resolution.xy);
-  float base_unit_size=3.;
-  float x_unit=pixel_size.x*x_base_repeat*base_unit_size;
-  float y_unit=pixel_size.y*y_base_repeat*base_unit_size;
-  
-  position.y+=u_time*.000055;
-  
-  // What grid position am i in
-  vec2 quadrant=floor(position.xy*vec2(x_repeat,y_repeat));
-  
-  // Tile position
-  position=vec2(fract(position.x*x_repeat),fract(position.y*y_repeat));
-  
-  // Fuck
-  float a=(cross_shape(
-      position,
-      vec4(
-        section_length(quadrant+1.),// r
-        section_length(quadrant+2.),// b
-        section_length(quadrant+3.),// l
-        section_length(quadrant+4.)// t
-      )*remove_one(quadrant)*remove_one(quadrant+1.),
-      vec2(y_unit,x_unit)
-    )*mix(0.,1.,random(position))
-  )*pow(shifted_position.x,2.)*pow(shifted_position.y,1.5);
-  
-  outColor=vec4(vec3(0.,0.,0.),a*5.);
+  vec3 f = rgb(240., 234., 223.);
+  vec3 b = rgb(234., 229., 215.);
+  outColor = vec4(mix(f, b, fVoronoi), 1.0);
 }

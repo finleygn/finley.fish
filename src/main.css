@@ -115,6 +115,7 @@ canvas {
 
 .fish-icon {
   position: absolute;
+  line-height: 26px;
 }
 
 @keyframes button-appear {
