@@ -1,5 +1,5 @@
-import default_vertex_shader_src from './shader/default.vert.glsl?raw';
-import bricks_frag_shader_src from './shader/bricks.frag.glsl?raw';
+import default_vertex_shader_src from './shader/default.vert.glsl';
+import bricks_frag_shader_src from './shader/bricks.frag.glsl';
 import Fish, { FishState } from './fish/Fish';
 import Vector2 from './util/Vector2';
 import MousePositionTracker from './util/MousePosition';
