@@ -23,7 +23,6 @@ class FishStateBehaviourAlert implements IFishStateBehaviour {
     const movementDirection = this.mouse.position.direction(fish.getPosition()).multiply(-1)
     fish.setDirection(movementDirection);
     fish.setVelocity(movementDirection);
-
     fish.setSpeed(1.0);
   }
 

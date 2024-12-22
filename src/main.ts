@@ -4,6 +4,7 @@ import Fish, { FishState } from './fish/Fish';
 import Vector2 from './util/Vector2';
 import MousePositionTracker from './util/MousePosition';
 import './main.css';
+import { createProgram, createShader } from './shader/helpers';
 
 const mouseTracker = new MousePositionTracker();
 
@@ -21,33 +22,26 @@ if (!fishElement || !fishIconElement || !addFishButton) {
 const originalFish = new Fish(fishElement, fishIconElement, mouseTracker);
 const fishSchool = [originalFish];
 
-addFishButton.onclick = (event) => {
-  /**
-   * Create Fish Element
-   */
-  const newFishContainer = document.createElement('span');
-  const newFishIcon = document.createElement('img');
-  newFishContainer.className = 'fish';
-  newFishIcon.className = 'fish-icon';
-  newFishIcon.src = "/fish.svg";
-  newFishContainer.style.top = `${Math.random() * window.innerHeight}px`;
-  newFishContainer.style.left = `${Math.random() * window.innerWidth}px`;
+function createNewFish(from: Vector2) {
+  const fishDom = fishElement.cloneNode(true) as HTMLDivElement;
+  const fishIconDom = <HTMLSpanElement>fishDom.getElementsByClassName('fish-icon')[0];
 
-  newFishIcon.innerText = "🐟";
+  fishDom.style.top = `${Math.random() * window.innerHeight}px`;
+  fishDom.style.left = `${Math.random() * window.innerWidth}px`;
+  fishDom.style.transform = ''
+  document.body.prepend(fishDom);
 
-  newFishContainer.appendChild(newFishIcon);
-  document.body.prepend(newFishContainer);
-
-  /**
-   * Setup Fish State 
-   */
-  const newFish = new Fish(newFishContainer, newFishIcon, mouseTracker);
-  // And point to the mouse position, as we can't get that without a mouse move event otherwise :(
-  const lookDirection = new Vector2(event.pageX, event.pageY).direction(newFish.getPosition());
+  const newFish = new Fish(fishDom, fishIconDom, mouseTracker);
+  const lookDirection = from.direction(newFish.getPosition());
   newFish.setDirection(lookDirection);
   newFish.setVelocity(lookDirection);
   newFish.setState(FishState.CHASE);
+
   fishSchool.push(newFish); // Add to the school c:
+}
+
+addFishButton.onclick = (event) => {
+  createNewFish(new Vector2(event.pageX, event.pageY))
 }
 
 /**
@@ -59,72 +53,23 @@ if (!canvas) throw new Error("No canvas found.");
 const gl = canvas.getContext('webgl2');
 if (!gl) throw new Error("WEBGL2 not supported.")
 
-function createShader(gl: WebGL2RenderingContext, type: GLenum, source: string): WebGLShader {
-  const shader = gl.createShader(type);
-  if (!shader) throw new Error("Failed to create shader.");
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
-  if (success) {
-    return shader;
-  }
-  console.error(gl.getShaderInfoLog(shader));
-  gl.deleteShader(shader);
-  throw new Error();
-}
-
-function createProgram(gl: WebGL2RenderingContext, vertexShader: WebGLShader, fragmentShader: WebGLShader): WebGLProgram {
-  const program = gl.createProgram();
-  if (!program) throw new Error("Failed to create program.");
-
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-  const success = gl.getProgramParameter(program, gl.LINK_STATUS);
-  if (success) {
-    return program;
-  }
-
-  console.error(gl.getProgramInfoLog(program));
-  gl.deleteProgram(program);
-  throw new Error();
-}
-
 const vertexShader = createShader(gl, gl.VERTEX_SHADER, default_vertex_shader_src);
 const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, bricks_frag_shader_src);
-
 const program = createProgram(gl, vertexShader, fragmentShader);
-
-const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
 
 const positionBuffer = gl.createBuffer();
 
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
 // Full screen tri
-gl.bufferData(
-  gl.ARRAY_BUFFER,
-  new Float32Array([
-    -1, -1,
-    3, -1,
-    -1, 3,
-  ]),
-  gl.STATIC_DRAW
-);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
 
 const vao = gl.createVertexArray();
+const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+
 gl.bindVertexArray(vao);
 gl.enableVertexAttribArray(positionAttributeLocation);
-gl.vertexAttribPointer(
-  positionAttributeLocation,
-  2,
-  gl.FLOAT,
-  false,
-  0,
-  0
-);
-
-const time0 = (new Date()).getTime();
+gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
 const timeLocation = gl.getUniformLocation(program, "u_time");
 const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
@@ -132,10 +77,10 @@ const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
 gl.useProgram(program);
 gl.bindVertexArray(vao);
 
-
 /**
- * Canvas & Fish Updates...
+ * Render loop
  */
+const time0 = (new Date()).getTime();
 let lastFrameTime = Date.now();
 const longestFrame = 50;
 
