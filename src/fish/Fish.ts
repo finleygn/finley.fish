@@ -56,7 +56,7 @@ class Fish {
 
     // Push each instance of fish away from each other
     for (const fishie of fish) {
-      if (fishie === this) break;
+      if (fishie === this) continue;
       const direction = this.getPosition().subtract(fishie.getPosition());
       const distance = direction.magnitude();
 
