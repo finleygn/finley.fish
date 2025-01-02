@@ -9,6 +9,10 @@ class MousePositionTracker {
       this.x = event.pageX;
       this.y = event.pageY;
     })
+    window.addEventListener('touchmove', (event: TouchEvent) => {
+      this.x = event.touches[0].pageX;
+      this.y = event.touches[0].pageY;
+    })
   }
 
   get position(): Vector2 {
