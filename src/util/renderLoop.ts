@@ -18,8 +18,6 @@ function renderLoop(fn: (data: TimeData) => void, longestFrame = 50) {
 
     window.requestAnimationFrame(run);
   }
-
-  window.addEventListener('resize', run);
   run();
 }
 
