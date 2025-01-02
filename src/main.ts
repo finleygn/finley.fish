@@ -24,6 +24,17 @@ if (!canvas || !fishElement || !fishIconElement || !addFishButton) {
 /**
  * Fish
  */
+function setupFishAndSchool() {
+  const fish = new Fish(fishElement, fishIconElement, mouseTracker);
+  const school = [fish];
+
+  addFishButton.onclick = (event) => {
+    school.push(createNewFish(new Vector2(event.pageX, event.pageY)));
+  }
+
+  return { fish, school };
+}
+
 function createNewFish(from: Vector2) {
   const fishDom = fishElement.cloneNode(true) as HTMLDivElement;
   const fishIconDom = <HTMLSpanElement>fishDom.getElementsByClassName('fish-icon')[0];
@@ -59,7 +70,7 @@ function handleCanvasResize(canvas: HTMLCanvasElement) {
   }
 }
 
-function setupWebGL(canvas: HTMLCanvasElement) {
+function setupBackgroundShader(canvas: HTMLCanvasElement) {
   const gl = canvas.getContext('webgl2');
   if (!gl) throw new Error("WEBGL2 not supported.")
   
@@ -94,14 +105,8 @@ function setupWebGL(canvas: HTMLCanvasElement) {
 }
 
 function start() {
-  const originalFish = new Fish(fishElement, fishIconElement, mouseTracker);
-  const fishSchool = [originalFish];
-
-  addFishButton.onclick = (event) => {
-    fishSchool.push(createNewFish(new Vector2(event.pageX, event.pageY)));
-  }
-
-  const { gl, locations } = setupWebGL(canvas);
+  const { fish, school } = setupFishAndSchool();
+  const { gl, locations } = setupBackgroundShader(canvas);
 
   const onFrameBackground = (time: TimeData) => {
     handleCanvasResize(canvas);
@@ -116,18 +121,18 @@ function start() {
   }
   
   const onFrameFish = (time: TimeData) => {
-    for (const fishie of fishSchool) {
-      fishie.frame(time.dt, fishSchool);
+    for (const fishie of school) {
+      fishie.frame(time.dt, school);
     }
   
     // Show button when fish has moved sufficiently far from the starting position
     if (addFishButton.style.visibility !== "hidden") {
-      const fishPosition = originalFish.getPosition();
+      const fishPosition = fish.getPosition();
       const { top, left, width, height } = addFishButton.getBoundingClientRect();
       const windowFishPosition = new Vector2(fishPosition.x, fishPosition.y);
       const windowAddFishButtonPosition = new Vector2(left + width * 0.5, top + height * 0.5);
   
-      if (windowFishPosition.distance(windowAddFishButtonPosition) > 70 && originalFish.state !== FishState.IDLE) {
+      if (windowFishPosition.distance(windowAddFishButtonPosition) > 70 && fish.state !== FishState.IDLE) {
         addFishButton.style.visibility = "visible"
         addFishButton.classList.add("add-fish--visible");
       }
