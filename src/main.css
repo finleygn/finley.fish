@@ -89,6 +89,14 @@ a:visited {
   color: #5f5c56;
 }
 
+.email::after {
+  content: attr(data-domain);
+}
+
+.email::before {
+  content: attr(data-user);
+}
+
 canvas {
   position: fixed;
   top: 0;

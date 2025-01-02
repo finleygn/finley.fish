@@ -6,6 +6,7 @@ import MousePositionTracker from './util/MousePosition';
 import './main.css';
 import { createProgram, createShader } from './shader/helpers';
 import renderLoop, { TimeData } from './util/renderLoop';
+import './emailOverwrite';
 
 const mouseTracker = new MousePositionTracker();
 
