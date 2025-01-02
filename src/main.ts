@@ -124,14 +124,12 @@ const resizeAndDraw = () => {
     const windowFishPosition = new Vector2(fishPosition.x, fishPosition.y);
     const windowAddFishButtonPosition = new Vector2(left + width * 0.5, top + height * 0.5);
 
-
     if (windowFishPosition.distance(windowAddFishButtonPosition) > 70 && originalFish.state !== FishState.IDLE) {
       addFishButton.style.visibility = "visible"
       addFishButton.classList.add("add-fish--visible");
     }
   }
 };
-
 
 resizeAndDraw();
 window.addEventListener('resize', resizeAndDraw);

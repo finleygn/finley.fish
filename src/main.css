@@ -44,12 +44,6 @@ header {
   width: 100%;
 }
 
-.original-fish-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
 header h1 {
   font-size: 26px;
   line-height: 1;
