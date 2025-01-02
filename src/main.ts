@@ -1,27 +1,29 @@
 import default_vertex_shader_src from './shader/default.vert.glsl';
-import bricks_frag_shader_src from './shader/bricks.frag.glsl';
+import waves_frag_shader_src from './shader/waves.frag.glsl';
 import Fish, { FishState } from './fish/Fish';
 import Vector2 from './util/Vector2';
 import MousePositionTracker from './util/MousePosition';
 import './main.css';
 import { createProgram, createShader } from './shader/helpers';
+import renderLoop, { TimeData } from './util/renderLoop';
 
 const mouseTracker = new MousePositionTracker();
 
 /**
- * Fish setup
+ * DOM Lookup
  */
+const canvas = <HTMLCanvasElement>document.getElementById('canvas');
 const fishElement = <HTMLSpanElement>document.getElementsByClassName('fish')[0];
 const fishIconElement = <HTMLSpanElement>document.getElementsByClassName('fish-icon')[0];
 const addFishButton = <HTMLButtonElement>document.getElementsByClassName('add-fish')[0];
 
-if (!fishElement || !fishIconElement || !addFishButton) {
+if (!canvas || !fishElement || !fishIconElement || !addFishButton) {
   throw new Error("No fish element found.");
 }
 
-const originalFish = new Fish(fishElement, fishIconElement, mouseTracker);
-const fishSchool = [originalFish];
-
+/**
+ * Fish
+ */
 function createNewFish(from: Vector2) {
   const fishDom = fishElement.cloneNode(true) as HTMLDivElement;
   const fishIconDom = <HTMLSpanElement>fishDom.getElementsByClassName('fish-icon')[0];
@@ -37,62 +39,13 @@ function createNewFish(from: Vector2) {
   newFish.setVelocity(lookDirection);
   newFish.setState(FishState.CHASE);
 
-  fishSchool.push(newFish); // Add to the school c:
-}
-
-addFishButton.onclick = (event) => {
-  createNewFish(new Vector2(event.pageX, event.pageY))
+  return newFish;
 }
 
 /**
- * Background stuffs
+ * Background
  */
-const canvas = <HTMLCanvasElement>document.getElementById('canvas');
-if (!canvas) throw new Error("No canvas found.");
-
-const gl = canvas.getContext('webgl2');
-if (!gl) throw new Error("WEBGL2 not supported.")
-
-const vertexShader = createShader(gl, gl.VERTEX_SHADER, default_vertex_shader_src);
-const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, bricks_frag_shader_src);
-const program = createProgram(gl, vertexShader, fragmentShader);
-
-const positionBuffer = gl.createBuffer();
-
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-// Full screen tri
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
-
-const vao = gl.createVertexArray();
-const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
-
-gl.bindVertexArray(vao);
-gl.enableVertexAttribArray(positionAttributeLocation);
-gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
-
-const timeLocation = gl.getUniformLocation(program, "u_time");
-const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-
-gl.useProgram(program);
-gl.bindVertexArray(vao);
-
-/**
- * Render loop
- */
-const time0 = (new Date()).getTime();
-let lastFrameTime = Date.now();
-const longestFrame = 50;
-
-const resizeAndDraw = () => {
-  requestAnimationFrame(resizeAndDraw);
-
-  const currentTime = Date.now();
-  let dt = currentTime - lastFrameTime;
-  if (dt > longestFrame) dt = longestFrame;
-
-  lastFrameTime = currentTime;
-
+function handleCanvasResize(canvas: HTMLCanvasElement) {
   const dpr = window.devicePixelRatio;
   const { width, height } = canvas.getBoundingClientRect();
   const displayWidth = Math.round(width * dpr);
@@ -104,32 +57,87 @@ const resizeAndDraw = () => {
     canvas.width = displayWidth;
     canvas.height = displayHeight;
   }
+}
 
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  gl.clearColor(0, 0, 0, 0);
-  gl.clear(gl.COLOR_BUFFER_BIT);
+function setupWebGL(canvas: HTMLCanvasElement) {
+  const gl = canvas.getContext('webgl2');
+  if (!gl) throw new Error("WEBGL2 not supported.")
+  
+  const vertexShader = createShader(gl, gl.VERTEX_SHADER, default_vertex_shader_src);
+  const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, waves_frag_shader_src);
+  const program = createProgram(gl, vertexShader, fragmentShader);
+  
+  const positionBuffer = gl.createBuffer();
+  
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  
+  // Full screen tri
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
+  
+  const vao = gl.createVertexArray();
+  const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+  
+  gl.bindVertexArray(vao);
+  gl.enableVertexAttribArray(positionAttributeLocation);
+  gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+  
+  gl.useProgram(program);
+  gl.bindVertexArray(vao);
 
-  gl.uniform1f(timeLocation, (new Date()).getTime() - time0);
-  gl.uniform2fv(resolutionLocation, [canvas.width, canvas.height]);
+  return { 
+    gl,
+    locations: {
+      time: gl.getUniformLocation(program, "u_time"),
+      resolution: gl.getUniformLocation(program, "u_resolution")
+    }
+  };
+}
 
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
+function start() {
+  const originalFish = new Fish(fishElement, fishIconElement, mouseTracker);
+  const fishSchool = [originalFish];
 
-  for (const fishie of fishSchool) {
-    fishie.frame(dt, fishSchool);
+  addFishButton.onclick = (event) => {
+    fishSchool.push(createNewFish(new Vector2(event.pageX, event.pageY)));
   }
 
-  if (addFishButton.style.visibility !== "hidden") {
-    const fishPosition = originalFish.getPosition();
-    const { top, left, width, height } = addFishButton.getBoundingClientRect();
-    const windowFishPosition = new Vector2(fishPosition.x, fishPosition.y);
-    const windowAddFishButtonPosition = new Vector2(left + width * 0.5, top + height * 0.5);
+  const { gl, locations } = setupWebGL(canvas);
 
-    if (windowFishPosition.distance(windowAddFishButtonPosition) > 70 && originalFish.state !== FishState.IDLE) {
-      addFishButton.style.visibility = "visible"
-      addFishButton.classList.add("add-fish--visible");
+  const onFrameBackground = (time: TimeData) => {
+    handleCanvasResize(canvas);
+  
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+  
+    gl.uniform1f(locations.time, time.elapsed);
+    gl.uniform2fv(locations.resolution, [canvas.width, canvas.height]);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+  
+  const onFrameFish = (time: TimeData) => {
+    for (const fishie of fishSchool) {
+      fishie.frame(time.dt, fishSchool);
+    }
+  
+    // Show button when fish has moved sufficiently far from the starting position
+    if (addFishButton.style.visibility !== "hidden") {
+      const fishPosition = originalFish.getPosition();
+      const { top, left, width, height } = addFishButton.getBoundingClientRect();
+      const windowFishPosition = new Vector2(fishPosition.x, fishPosition.y);
+      const windowAddFishButtonPosition = new Vector2(left + width * 0.5, top + height * 0.5);
+  
+      if (windowFishPosition.distance(windowAddFishButtonPosition) > 70 && originalFish.state !== FishState.IDLE) {
+        addFishButton.style.visibility = "visible"
+        addFishButton.classList.add("add-fish--visible");
+      }
     }
   }
-};
 
-resizeAndDraw();
-window.addEventListener('resize', resizeAndDraw);
+  renderLoop((time: TimeData) => {
+    onFrameBackground(time);
+    onFrameFish(time);
+  });
+}
+
+start();
