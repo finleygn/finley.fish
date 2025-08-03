@@ -48,7 +48,7 @@ float voronoi(in vec2 uv, float smoothness) {
 void main() {
   vec2 R = u_resolution.xy;
   vec2 uv = (2.0 * (v_position.xy*R) - R) / min(R.x, R.y);
-  uv *= 0.4;
+  uv *= 0.5;
   uv.y += u_time * 0.0001;
   uv.x += u_time * 0.00004;
   
@@ -56,7 +56,7 @@ void main() {
   float sNoise = voronoi(uv, 0.5);
   float fVoronoi = smoothstep(0.0, 0.02, vNoise-sNoise-0.08);
 
-  vec3 f = rgb(240., 234., 223.);
-  vec3 b = rgb(234., 229., 215.);
+  vec3 f = rgb(113., 193., 227.);
+  vec3 b = rgb(143., 212., 242.);
   outColor = vec4(mix(f, b, fVoronoi), 1.0);
 }

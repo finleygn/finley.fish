@@ -3,7 +3,7 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   background-color: #f9f6ee;
-  color: #4c4841;
+  color: #1f3250;
   font-family: monospace;
 }
 
@@ -61,7 +61,7 @@ article hr {
   margin-top: 8px;
   border: none;
   height: 1px;
-  background: #4c4841;
+  background: #1f3250;
 }
 
 article p,
@@ -81,7 +81,7 @@ article ul li {
 
 a {
   font-weight: bold;
-  color: #927e5f;
+  color: #3154c4ff;
   text-decoration: underline;
 }
 
@@ -144,9 +144,9 @@ canvas {
 }
 
 .add-fish {
-  border: 1px solid #5f5c56;
+  border: 1px solid #49446eff;
   border-radius: 3px;
-  background: #927e5f;
+  background: #38458dff;
   color: white;
   cursor: pointer;
   visibility: hidden;
