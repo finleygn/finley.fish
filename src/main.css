@@ -3,7 +3,7 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   background-color: #f9f6ee;
-  color: #1f3250;
+  color: #2c508b;
   font-family: monospace;
 }
 
@@ -81,12 +81,12 @@ article ul li {
 
 a {
   font-weight: bold;
-  color: #3154c4ff;
+  color: rgb(63, 78, 126);
   text-decoration: underline;
 }
 
 a:visited {
-  color: #5f5c56;
+  color: #251353;
 }
 
 .email::after {
@@ -131,12 +131,15 @@ canvas {
     transform: scale(0);
     opacity: 0;
   }
+
   50% {
     opacity: 1;
   }
+
   60% {
     transform: scale(1.2);
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -165,16 +168,20 @@ canvas {
     transform: scale(0) rotate(0deg);
     opacity: 0;
   }
+
   20% {
     opacity: 1;
   }
+
   30% {
     transform: scale(1.2) rotate(20deg);
   }
+
   40% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
   }
+
   100% {
     opacity: 0;
   }
