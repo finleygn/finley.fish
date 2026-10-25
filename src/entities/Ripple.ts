@@ -1,78 +1,96 @@
-import WrappedProgram from "../framework/WrappedProgram";
 import shaderDefaultVertex from '../shaders/default.vert.glsl?raw';
 import shaderRippleFragment from '../shaders/ripple.frag.glsl?raw';
-import Mat2 from "../math/Mat2";
-import { Vec2 } from "@fishley/wwwgraphics/math";
+import Mat2, * as mat2 from "@fishley/wwwgraphics/math/mat2";
+import Vec2 from "@fishley/wwwgraphics/math/vec2";
 import { AnimatedValue, EaseType } from "@fishley/wwwgraphics/animation/engine";
-import { createBasicQuadGeometry, QUAD_GEOMETRY } from "../geometry";
+import { QUAD_GEOMETRY } from "../geometry";
 import { createGeometryBuffer } from "../framework/webgl";
 import type GlobalContext from "../framework/GlobalContext";
-import { lerp } from "@fishley/wwwgraphics/animation";
+import { lerp } from "@fishley/wwwgraphics/math";
+import ProgramContainer, { UniformType } from '../framework/ProgramContainer';
 
-class RippleProgram extends WrappedProgram {
-  public u_matrix_location: WebGLUniformLocation;
-  public u_progress_location: WebGLUniformLocation;
-  public u_thickness_location: WebGLUniformLocation;
-
-  public a_position_location: number;
-
+class RippleProgram extends ProgramContainer {
+  uniforms = {
+    matrix: this.uniform("u_matrix", UniformType.UniformMatrix3x2fv),
+    progress: this.uniform("u_progress", UniformType.Uniform1f),
+    thickness: this.uniform("u_thickness", UniformType.Uniform1f),
+  }
+  attributes = {
+    position: this.attribute("position")
+  }
   constructor(gl: WebGL2RenderingContext) {
     super(gl, shaderDefaultVertex, shaderRippleFragment);
-
-    this.u_matrix_location = this.setupUniformLocation(this.program, "u_matrix");
-    this.u_progress_location = this.setupUniformLocation(this.program, "u_progress");
-    this.u_thickness_location = this.setupUniformLocation(this.program, "u_thickness");
-
-    this.a_position_location = this.setupAttributeLocation(this.program, "position");
   }
+}
 
-  public setUniformMatrix(matrix: Mat2) {
-    this.gl.uniformMatrix3x2fv(
-      this.u_matrix_location,
-      false,
-      matrix
-    );
-  }
+const CENTER_OFFSET = new Vec2(-0.5, -0.5);
 
-  public setUniformProgress(progress: number) {
-    this.gl.uniform1f(
-      this.u_progress_location,
-      progress
-    );
-  }
-
-  public setUniformThickness(thickness: number) {
-    this.gl.uniform1f(
-      this.u_thickness_location,
-      thickness
-    );
-  }
+interface RippleInstance {
+  position: Vec2,
+  progress: number,
+  scale: Vec2
 }
 
 class Ripples {
   private context: GlobalContext;
   private program: RippleProgram;
-  private instances: { position: Vec2, progress: number, scale: number }[] = [];
+  private instances: RippleInstance[] = [];
 
-  private geometryBuffer: WebGLBuffer;
+  private vao: WebGLVertexArrayObject;
+
+  private matrix: Mat2 = new Mat2();
 
   constructor(context: GlobalContext) {
+    const gl = context.gl;
     this.context = context;
-    this.program = new RippleProgram(context.gl);
-    this.geometryBuffer = createGeometryBuffer(context.gl, QUAD_GEOMETRY);
+    this.program = new RippleProgram(gl);
+
+    this.vao = gl.createVertexArray()
+    gl.bindVertexArray(this.vao)
+
+    createGeometryBuffer(gl, QUAD_GEOMETRY);
+    gl.vertexAttribPointer(this.program.attributes.position, 2, gl.FLOAT, false, 0, 0)
+    gl.enableVertexAttribArray(this.program.attributes.position);
+
+    gl.bindVertexArray(null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
   }
 
-  public createRipple(position: Vec2, delay: number, scale: number) {
+  public draw() {
+    const gl = this.context.gl;
+    const program = this.program;
+
+    program.use();
+    gl.bindVertexArray(this.vao);
+    
+    for (const ripple of this.instances) {
+      mat2.copy(this.matrix, this.context.asciiProjection);
+      mat2.translate(this.matrix, ripple.position);
+      mat2.scale(this.matrix, ripple.scale);
+      mat2.translate(this.matrix, CENTER_OFFSET);
+
+      program.uniforms.matrix.set(this.matrix);
+      program.uniforms.progress.set(ripple.progress);
+      program.uniforms.thickness.set(lerp(0.05, 0, ripple.scale.x));
+
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+
+    gl.bindVertexArray(null);
+  }
+
+  public createRipple(position: Vec2, delay: number, scale: Vec2) {
     const ripple = { position, progress: 0, scale};
 
     const animatedObject = new AnimatedValue(
-      (progress) => {
-        ripple.progress = progress
-      },
       {
         ease: EaseType.EASE_OUT,
         duration: 2 + delay,
         delay: delay,
+        autodispose: true,
+        callback: (progress) => {
+          ripple.progress = progress
+        },
         finish: () => {
           this.instances.shift()
         },
@@ -80,35 +98,8 @@ class Ripples {
     );
 
     this.instances.push(ripple);
-    this.context.animationEngine.add(animatedObject.ani);
+    this.context.animationEngine.add(animatedObject);
   }
-
-  public draw() {
-    const gl = this.context.gl;
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.geometryBuffer);
-
-    gl.vertexAttribPointer(this.program.a_position_location, 2, gl.FLOAT, false, 0, 0)
-    gl.enableVertexAttribArray(this.program.a_position_location);
-
-    this.program.use();
-
-    for (const ripple of this.instances) {
-      const boxMatrix = Mat2.copy(new Mat2(), this.context.asciiProjection)
-        .translate(ripple.position)
-        .scale(new Vec2(ripple.scale, ripple.scale))
-        .translate(new Vec2(-0.5, -0.5))
-        
-
-      this.program.setUniformMatrix(boxMatrix);
-      this.program.setUniformProgress(ripple.progress);
-      this.program.setUniformThickness(lerp(0.05, 0, ripple.scale));
-
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-    }
-  }
-
-  
 }
 
 export default Ripples;

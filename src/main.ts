@@ -1,4 +1,5 @@
-import { AutonomousSmoothValue, lerp } from "@fishley/wwwgraphics/animation";
+import { AutonomousSmoothValue } from "@fishley/wwwgraphics/animation";
+import { lerp } from "@fishley/wwwgraphics/math";
 import { renderLoop } from "@fishley/wwwgraphics/app";
 import { MousePositionTracker } from "@fishley/wwwgraphics/interaction";
 import imageAsciiCharset from "./assets/ascii.png";
@@ -12,8 +13,9 @@ import GlobalContext from "./framework/GlobalContext";
 import { createWebGLInstance, loadTexture } from "./framework/webgl";
 import FrameBuffer from "./framework/FrameBuffer";
 import ThePlane from "./entities/ThePlane";
-import Mat4, { from_vec2, identity, invert, multiply, rotate, scale, to_vec2, transformPoint, translate } from "./math/Mat4";
-import { Vec2 } from "@fishley/wwwgraphics/math";
+import Mat4, * as mat4 from "@fishley/wwwgraphics/math/mat4";
+import Vec2 from "@fishley/wwwgraphics/math/vec2";
+import Vec3, * as vec3 from "@fishley/wwwgraphics/math/vec3";
 
 const gl = createWebGLInstance(appCanvas);
 gl.clearColor(0,0,0,1); 
@@ -36,11 +38,11 @@ const globalContext = new GlobalContext(gl, appCanvas);
 const ripples = new Ripples(globalContext);
 
 const lilypad1 = new Lilypad(globalContext);
-const lilypad1position_x = 1;
+const lilypad1position_x = -0.3;
 const lilypad1position_y = -0.5;
 lilypad1.rotation = 0;
-lilypad1.scale.x = 1;
-lilypad1.scale.y = 1;
+lilypad1.scale.x = 0.4;
+lilypad1.scale.y = 0.4;
 
 const lilypad2 = new Lilypad(globalContext);
 const lilypad2position_x = 0.8;
@@ -82,58 +84,55 @@ window.addEventListener("keydown", (e) => {
 });
 
 
+export function transformPoint(m: Mat4, x: number, y: number, z: number): Vec3 {
+  const w = m[3] * x + m[7] * y + m[11] * z + m[15];
+  return new Vec3(
+    (m[0] * x + m[4] * y + m[8] * z + m[12]) / w,
+    (m[1] * x + m[5] * y + m[9] * z + m[13]) / w,
+    (m[2] * x + m[6] * y + m[10] * z + m[14]) / w,
+  );
+}
+
 window.addEventListener("mousedown", (e) => {
-  const rect = appCanvas.getBoundingClientRect();
-  const ndcX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-  const ndcY = 1 - ((e.clientY - rect.top) / rect.height) * 2;
+  const x = (e.clientX / window.innerWidth) * 2 - 1;
+  const y = 1 - (e.clientY / window.innerHeight) * 2;
 
   const inv = new Mat4();
-  multiply(inv, globalContext.perspectiveProjection);
-  multiply(inv, thePlane.modelMatrix);
-  if (!invert(inv, inv)) return;
+  mat4.multiply(inv, globalContext.perspectiveProjection);
+  mat4.multiply(inv, thePlane.modelMatrix);
+  if (!mat4.invert(inv)) return;
 
-  const near = transformPoint(inv, ndcX, ndcY, -1);
-  const far = transformPoint(inv, ndcX, ndcY, 1);
+  // get point in the planes local space
+  const near = transformPoint(inv, x, y, -1);
+  const far = transformPoint(inv, x, y, 1);
+  
+  // How how from the near plane to the_plane. works because plane is always at z=0
+  const d = vec3.direction(near, far);
+  const t = -near.z / d.z;
+  const distance = vec3.multiplyScalar(vec3.from(d), t);
 
-  // intersect the ray with the curved surface from object.vert.glsl: z = -(x² + y²)
-  const dx = far[0] - near[0];
-  const dy = far[1] - near[1];
-  const dz = far[2] - near[2];
-  const a = dx * dx + dy * dy;
-  const b = 2 * (near[0] * dx + near[1] * dy) + dz;
-  const c = near[0] * near[0] + near[1] * near[1] + near[2];
+  const intersect = vec3.add(
+    vec3.from(near),
+    distance
+ );
+ 
+ // to -1 - 1 space
+ vec3.multiplyScalar(intersect, 2);
 
-  let t: number;
-  if (Math.abs(a) < 1e-9) {
-    t = -c / b;
-  } else {
-    const disc = b * b - 4 * a * c;
-    if (disc < 0) return;
-    const sq = Math.sqrt(disc);
-    const t0 = (-b - sq) / (2 * a);
-    const t1 = (-b + sq) / (2 * a);
-    // nearest hit in front of the camera
-    t = t0 >= 0 ? Math.min(t0, t1 >= 0 ? t1 : t0) : t1;
-  }
-  if (!(t >= 0)) return;
+  const p = new Vec2(intersect.x, intersect.y);
 
-  const localX = near[0] + dx * t;
-  const localY = near[1] + dy * t;
-
-  const aspect = appCanvas.clientWidth / appCanvas.clientHeight;
-
-  const p = new Vec2(localX * 2 * aspect, localY * 2);
-
-  ripples.createRipple(p, 0, 1);
-  ripples.createRipple(p, 0.1, 0.6);
-  ripples.createRipple(p, 0.4, 0.2);
+  ripples.createRipple(p, 0, new Vec2(1, 1));
+  ripples.createRipple(p, 0.1, new Vec2(0.6, 0.6));
+  ripples.createRipple(p, 0.4, new Vec2(0.2, 0.2));
 });
 
-const SCALE = 3;
-
-
-
-
+const SCALE = 2;
+const PLANE_OFFSET = new Vec3(0, 0, -2);
+const PLANE_SCALE = new Vec3(1, 1, 1);
+// Bottom edge of the plane, which is the edge closest to the camera once it tilts back
+const PLANE_PIVOT = new Vec3(0, -1 / 2, 0);
+const PLANE_PIVOT_INVERSE = new Vec3(0, 1 / 2, 0);
+const planeRotationAxis = new Vec3(0, 0, 0);
 
 
 
@@ -149,31 +148,26 @@ renderLoop(
         cursorTrailPosition.x.tick(frame.dt);
         cursorTrailPosition.y.tick(frame.dt);
 
-        // globalContext.projection.translate(
-        //     new Vec2(
-        //         cursorTrailPosition.x.value * 0.1,
-        //         -cursorTrailPosition.y.value * 0.1,
-        //     ),
-        // );
-
-        // Resolution updates
-        // const resolutionMultiple = Math.max(
-        //   appCanvas.clientWidth / CHAR_SIZE,
-        //   appCanvas.clientHeight / CHAR_SIZE
-        // ) / Math.max(appCanvas.clientWidth, appCanvas.clientHeight);
         const width = appCanvas.clientWidth;
         const height = appCanvas.clientHeight;
         gl.canvas.width = width * window.devicePixelRatio;
         gl.canvas.height = height * window.devicePixelRatio;
 
-        identity(thePlane.modelMatrix);
-        translate(thePlane.modelMatrix, [0, 0, -2])
-        rotate(thePlane.modelMatrix, 0.5, [
-            lerp(-0.2, 0, cursorTrailPosition.y.value),
-            lerp(-0.4, -0.15, cursorTrailPosition.x.value),
-            0
-        ])
-        scale(thePlane.modelMatrix, [SCALE, SCALE, 1])
+        mat4.identity(thePlane.modelMatrix);
+        mat4.translate(thePlane.modelMatrix, PLANE_OFFSET);
+        // planeRotationAxis.y = lerp(-0.01, 0.01, cursorTrailPosition.x.value);
+        // planeRotationAxis.x = lerp(-1, -0.7, cursorTrailPosition.y.value);
+
+        // Rotate around the near edge rather than the centre
+        // mat4.translate(thePlane.modelMatrix, PLANE_PIVOT);
+        // mat4.rotate(
+        //     thePlane.modelMatrix,
+        //     lerp(Math.PI/2, -1, cursorTrailPosition.y.value),
+        //     { x: -1, y: 0, z: 0 }
+        // );
+        // mat4.translate(thePlane.modelMatrix, PLANE_PIVOT_INVERSE);
+
+        // mat4.scale(thePlane.modelMatrix, PLANE_SCALE);
 
         lilypad2.position.x = lilypad2position_x + Math.sin(frame.elapsed) * 0.01;
         lilypad2.position.y = lilypad2position_y + Math.sin(frame.elapsed) * 0.05;
@@ -191,6 +185,7 @@ renderLoop(
             f.update(frame.dt);
         }
         
+        // The plane is square, so render the mask and ascii square too or they get stretched onto it
         maskFrameBuffer.setTextureDimensions(appCanvas.width, appCanvas.height)
         asciiFrameBuffer.setTextureDimensions(appCanvas.width, appCanvas.height)
 
@@ -205,8 +200,8 @@ renderLoop(
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, texture_lilypad);
             
-            lilypad1.draw();
-            lilypad2.draw();
+            // lilypad1.draw();
+            // lilypad2.draw();
         })
 
         // draw ascii        
@@ -228,7 +223,7 @@ renderLoop(
         
         
 
-        gl.clearColor(1, 1, 1, 1);
+        // gl.clearColor(1, 1, 1, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         thePlane.draw()

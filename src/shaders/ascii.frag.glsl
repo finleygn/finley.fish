@@ -6,7 +6,6 @@ in vec2 v_uv;
 out vec4 outColor;
 
 uniform vec2 u_resolution;
-uniform float u_char_aspect;
 uniform sampler2D u_character_texture;
 uniform sampler2D u_mask_texture;
 
@@ -19,7 +18,7 @@ uniform sampler2D u_mask_texture;
 // #define COLOUR_BACKGROUND vec3(0.0, 0.0, 1.0)
 // #define COLOUR_FOREGROUND vec3(1.0, 1.0, 1.0)
 
-#define CELL_SIZE 12.0
+#define CELL_SIZE 24.0
 #define CHAR_WIDTH 64.0
 struct CellData {
   vec2 origin;
@@ -28,12 +27,9 @@ struct CellData {
 };
 
 CellData cell_create(vec2 uv) {
-  float screen_aspect = u_resolution.x / u_resolution.y;
 
-  float count = u_resolution.x / CELL_SIZE;
-
-  float cells_x = count;
-  float cells_y = count * u_char_aspect / screen_aspect;
+  float cells_x = u_resolution.x / CELL_SIZE;
+  float cells_y = u_resolution.y / CELL_SIZE;
 
   vec2 cell_count = vec2(cells_x, cells_y);
   vec2 cell_size = 1.0f / cell_count;
@@ -51,7 +47,7 @@ float random(vec2 st) {
 }
 
 float fade(vec2 c) {
-  float threshold = smoothstep(0.8f, 1.1f, distance(c, vec2(1.0f, 0.0f)));
+  float threshold = smoothstep(0.4f, 1.0f, distance(c, vec2(0.5f, 0.0f)));
   return step(random(c), threshold);
   // return smoothstep(0.8f, 1.0f, random(c) * );
 }

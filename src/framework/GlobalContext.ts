@@ -1,6 +1,6 @@
 import { AnimationEngine } from "@fishley/wwwgraphics/animation/engine"
-import Mat2 from "../math/Mat2";
-import Mat4, { perspective } from "../math/Mat4";
+import Mat2, * as mat2 from "@fishley/wwwgraphics/math/mat2";
+import Mat4, * as mat4 from "@fishley/wwwgraphics/math/mat4";
 
 class GlobalContext {
   public gl: WebGL2RenderingContext;
@@ -22,7 +22,7 @@ class GlobalContext {
   }
 
   private setAsciiProjection(width: number, height: number) {
-    Mat2.orthographic(
+    mat2.orthographic(
       this.asciiProjection,
       width,
       height
@@ -30,11 +30,12 @@ class GlobalContext {
   }
 
   private setPerspectiveProjection(width: number, height: number) {
-    perspective(
+    mat4.perspective(
       this.perspectiveProjection,
-      Math.PI / 3.5,
-      width / height,
-      0.1,
+      width,
+      height,
+      Math.PI / 5,
+      0.001,
       100
     );
   }

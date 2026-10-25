@@ -16,6 +16,6 @@
     "typescript": "~6.0.2"
   },
   "dependencies": {
-    "@fishley/wwwgraphics": "npm:@jsr/fishley__wwwgraphics@0.2.16"
+    "@fishley/wwwgraphics": "npm:@jsr/fishley__wwwgraphics@1.0.0"
   }
 }

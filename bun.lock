@@ -4,7 +4,7 @@
     "": {
       "name": "finley.fish",
       "dependencies": {
-        "@fishley/wwwgraphics": "npm:@jsr/fishley__wwwgraphics@0.2.16",
+        "@fishley/wwwgraphics": "npm:@jsr/fishley__wwwgraphics@1.0.0",
       },
       "devDependencies": {
         "@astrojs/check": "^0.9.12",
@@ -106,7 +106,7 @@
 
     "@emnapi/wasi-threads": ["@emnapi/wasi-threads@1.2.3", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-ELEBe8PsLvvJ6QMr0zLt8ffvOHW/dc1m3CEzNMg7aJUv3bMaoDtw2TXyDAwkYBuroxxuHEwhRTLJSe5sya547g=="],
 
-    "@fishley/wwwgraphics": ["@jsr/fishley__wwwgraphics@0.2.16", "https://npm.jsr.io/~/11/@jsr/fishley__wwwgraphics/0.2.16.tgz", {}, "sha512-bXKdSziGMZVRKJHcjkHKep8ngONHo/DdxXSMjoarhVYxkC94Zvdn6HLUh6QV2XJYhsaOVmBVZjtjvhORBN6vPw=="],
+    "@fishley/wwwgraphics": ["@jsr/fishley__wwwgraphics@1.0.0", "https://npm.jsr.io/~/11/@jsr/fishley__wwwgraphics/1.0.0.tgz", {}, "sha512-DZttrPqrHpMgYhPT0WVWa7uynXa2A3tpIYdSqLEMQbn/DE4Qph9txfP2nga/8Lj/RsZI0AB41BDjovsOyULA8g=="],
 
     "@img/colour": ["@img/colour@1.1.0", "", {}, "sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ=="],
 

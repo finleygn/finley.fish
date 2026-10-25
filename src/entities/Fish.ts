@@ -1,8 +1,7 @@
-import { lerp } from "@fishley/wwwgraphics/animation";
-import { Vec2 } from "@fishley/wwwgraphics/math";
+import { lerp } from "@fishley/wwwgraphics/math";
+import Vec2, * as vec2 from "@fishley/wwwgraphics/math/vec2";
 import type GlobalContext from "../framework/GlobalContext";
-import WrappedProgram from "../framework/WrappedProgram";
-import Mat2 from "../math/Mat2";
+import ProgramContainer, { UniformType } from "../framework/ProgramContainer";
 import shaderDefaultFragment from "../shaders/default.frag.glsl?raw";
 import shaderDefaultVertex from "../shaders/default.vert.glsl?raw";
 
@@ -71,11 +70,10 @@ class FishSegmentHead extends FishSegment {
     private beginRotateToCenter() {
         this.state = FishMovementState.Turning;
 
-        const toCenter = new Vec2(
-            -this.position.x,
-            -this.position.y,
-        ).normalize();
-        const crossProduct = this.direction.cross(toCenter);
+        const toCenter = vec2.normalize(
+            new Vec2(-this.position.x, -this.position.y),
+        );
+        const crossProduct = vec2.cross(this.direction, toCenter);
         this.rotation = (crossProduct > 0 ? 1 : -1) * this.maxRotationSpeed;
 
         const dotProduct =
@@ -103,20 +101,18 @@ class FishSegmentHead extends FishSegment {
                 this.flipFlop();
             }
 
-            if (this.position.magnitude() > 2) {
+            if (vec2.magnitude(this.position) > 2) {
                 this.beginRotateToCenter();
             } else if (this.remainingSwimmingTime <= 0) {
                 this.beginRotate(); // Standard random wandering
             }
         }
 
-        this.direction.rotate(this.rotation * dt);
-        const next_position = this.position
-            .clone()
-            .add(this.direction.clone().multiplyScalar(this.speed * dt));
-
-        this.position.x = next_position.x;
-        this.position.y = next_position.y;
+        vec2.rotate(this.direction, this.rotation * dt);
+        vec2.add(
+            this.position,
+            vec2.multiplyScalar(vec2.from(this.direction), this.speed * dt),
+        );
     }
 }
 
@@ -131,57 +127,47 @@ class FishSegmentBody extends FishSegment {
 
     update() {
         if (
-            this.following.position.distance(this.position) >=
+            vec2.distance(this.following.position, this.position) >=
             FishSegment.MAX_DISTANCE
         ) {
-            const offset = this.position
-                .clone()
-                .subtract(this.following.position)
-                .normalize()
-                .multiplyScalar(FishSegment.MAX_DISTANCE);
+            const offset = vec2.multiplyScalar(
+                vec2.normalize(
+                    vec2.subtract(
+                        vec2.from(this.position),
+                        this.following.position,
+                    ),
+                ),
+                FishSegment.MAX_DISTANCE,
+            );
 
-            const new_position = this.following.position.clone().add(offset);
+            const new_position = vec2.add(
+                vec2.from(this.following.position),
+                offset,
+            );
 
             this.position.x = new_position.x;
             this.position.y = new_position.y;
         }
 
-        if (this.position.distance(this.following.position) > 0.00001) {
-            this.direction = this.position
-                .direction(this.following.position)
-                .multiplyScalar(-1);
+        if (vec2.distance(this.position, this.following.position) > 0.00001) {
+            this.direction = vec2.multiplyScalar(
+                vec2.direction(this.position, this.following.position),
+                -1,
+            );
         }
     }
 }
 
-class FishProgram extends WrappedProgram {
-    public u_matrix_location: WebGLUniformLocation;
-    public u_colour_location: WebGLUniformLocation;
-    public a_position_location: number;
-
+class FishProgram extends ProgramContainer {
+    uniforms = {
+        matrix: this.uniform("u_matrix", UniformType.UniformMatrix3x2fv),
+        colour: this.uniform("u_colour", UniformType.Uniform4f),
+    };
+    attributes = {
+        position: this.attribute("position"),
+    };
     constructor(gl: WebGL2RenderingContext) {
         super(gl, shaderDefaultVertex, shaderDefaultFragment);
-
-        this.u_matrix_location = this.setupUniformLocation(
-            this.program,
-            "u_matrix",
-        );
-        this.u_colour_location = this.setupUniformLocation(
-            this.program,
-            "u_colour",
-        );
-        this.a_position_location = this.setupAttributeLocation(
-            this.program,
-            "position",
-        );
-    }
-
-    public setUniformMatrix(matrix: Mat2) {
-        this.gl.uniformMatrix3x2fv(this.u_matrix_location, false, matrix);
-    }
-
-    public setUniformColour(colour: [number, number, number, number]) {
-        this.gl.uniform4fv(this.u_colour_location, colour);
     }
 }
 
@@ -190,13 +176,25 @@ class Fish {
     private program: FishProgram;
     private context: GlobalContext;
     private geometryBuffer: WebGLBuffer;
+    private vao: WebGLVertexArrayObject;
     public depth: number;
 
     constructor(context: GlobalContext) {
+        const gl = context.gl;
         this.context = context;
-        this.program = new FishProgram(context.gl);
+        this.program = new FishProgram(gl);
+
+        this.vao = gl.createVertexArray();
+        gl.bindVertexArray(this.vao);
+
         // This will need to be constructed on the fly in the future, just render quads for movement logic for now.
-        this.geometryBuffer = context.gl.createBuffer();
+        this.geometryBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.geometryBuffer);
+        gl.vertexAttribPointer(this.program.attributes.position, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(this.program.attributes.position);
+
+        gl.bindVertexArray(null);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
         const head = new FishSegmentHead(0.01);
         const segments: [FishSegmentHead, ...FishSegmentBody[]] = [head];
@@ -219,7 +217,7 @@ class Fish {
         const head = fish.segments[0];
         head.position.x = (Math.random() * 2 - 1) * 2;
         head.position.y = (Math.random() * 2 - 1) * 2;
-        const normalizedPosition = head.position.clone().normalize();
+        const normalizedPosition = vec2.normalize(vec2.from(head.position));
         head.direction.x = normalizedPosition.x;
         head.direction.y = normalizedPosition.y;
 
@@ -238,14 +236,14 @@ class Fish {
         for (const segment of this.segments.slice(0)) {
             segment.update(dt);
 
-            const vert_left = new Vec2(
-                -segment.direction.y,
-                segment.direction.x,
-            ).multiplyScalar(segment.size);
-            const vert_right = new Vec2(
-                segment.direction.y,
-                -segment.direction.x,
-            ).multiplyScalar(segment.size);
+            const vert_left = vec2.multiplyScalar(
+                new Vec2(-segment.direction.y, segment.direction.x),
+                segment.size,
+            );
+            const vert_right = vec2.multiplyScalar(
+                new Vec2(segment.direction.y, -segment.direction.x),
+                segment.size,
+            );
 
             geometry.push(
                 segment.position.x + vert_left.x,
@@ -266,27 +264,21 @@ class Fish {
     draw() {
         const gl = this.context.gl;
 
-        this.program.use();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.geometryBuffer);
+        const program = this.program;
 
-        gl.vertexAttribPointer(
-            this.program.a_position_location,
-            2,
-            gl.FLOAT,
-            false,
-            0,
-            0,
-        );
-        gl.enableVertexAttribArray(this.program.a_position_location);
+        program.use();
+        gl.bindVertexArray(this.vao);
 
-        this.program.setUniformMatrix(this.context.asciiProjection);
-        this.program.setUniformColour([
+        program.uniforms.matrix.set(this.context.asciiProjection);
+        program.uniforms.colour.set([
             this.depth,
             this.depth,
             this.depth,
             1.0,
         ]);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.segments.length * 2);
+
+        gl.bindVertexArray(null);
     }
 }
 
