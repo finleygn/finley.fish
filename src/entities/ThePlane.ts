@@ -26,7 +26,7 @@ class ThePlane {
   private context: GlobalContext;
   private program: ThePlaneProgram;
 
-  private quad = createQuadGeometry(3);
+  private quad = createQuadGeometry(10);
   public modelMatrix: Mat4 = new Mat4();
 
   private vao: WebGLVertexArrayObject;

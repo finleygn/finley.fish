@@ -33,8 +33,9 @@ class GlobalContext {
     mat4.perspective(
       this.perspectiveProjection,
       width,
-      height,
-      Math.PI / 5,
+      // width twice because ascii shader deals with the aspect ratio
+      width,
+      Math.PI / 3,
       0.001,
       100
     );

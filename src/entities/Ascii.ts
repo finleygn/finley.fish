@@ -5,12 +5,14 @@ import type GlobalContext from "../framework/GlobalContext";
 import { createGeometryBuffer } from "../framework/webgl";
 import { TRI_FULLSCREEN_GEOMETRY, TRI_FULLSCREEN_UV } from "../geometry";
 import Vec2 from "@fishley/wwwgraphics/math/vec2";
+import { inverseLerp } from "@fishley/wwwgraphics/math";
 
 class AsciiProgram extends ProgramContainer {
     uniforms = {
         characterTexture: this.uniform("u_character_texture", UniformType.Uniform1i),
         maskTexture: this.uniform("u_mask_texture", UniformType.Uniform1i),
         resolution: this.uniform("u_resolution", UniformType.Uniform2f),
+        cellSize: this.uniform("u_cell_size", UniformType.Uniform1f)
     };
     attributes = {
         position: this.attribute("position"),
@@ -60,9 +62,14 @@ class Ascii {
         this.resolution.x = this.context.canvas.clientWidth;
         this.resolution.y = this.context.canvas.clientHeight;
 
+        const resolution = Math.min(this.resolution.x, this.resolution.y);
+
         program.uniforms.resolution.set(this.resolution);
         program.uniforms.maskTexture.set(0);
         program.uniforms.characterTexture.set(1);
+        program.uniforms.cellSize.set(
+            (resolution / 70)
+        )
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
 

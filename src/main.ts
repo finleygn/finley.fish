@@ -119,20 +119,16 @@ window.addEventListener("mousedown", (e) => {
  // to -1 - 1 space
  vec3.multiplyScalar(intersect, 2);
 
-  const p = new Vec2(intersect.x, intersect.y);
+  const p = new Vec2(intersect.x * (window.innerWidth / window.innerHeight), intersect.y);
 
   ripples.createRipple(p, 0, new Vec2(1, 1));
   ripples.createRipple(p, 0.1, new Vec2(0.6, 0.6));
   ripples.createRipple(p, 0.4, new Vec2(0.2, 0.2));
 });
 
-const SCALE = 2;
+const SCALE = 2.4;
 const PLANE_OFFSET = new Vec3(0, 0, -2);
-const PLANE_SCALE = new Vec3(1, 1, 1);
-// Bottom edge of the plane, which is the edge closest to the camera once it tilts back
-const PLANE_PIVOT = new Vec3(0, -1 / 2, 0);
-const PLANE_PIVOT_INVERSE = new Vec3(0, 1 / 2, 0);
-const planeRotationAxis = new Vec3(0, 0, 0);
+const PLANE_SCALE = new Vec3(SCALE, SCALE, 1);
 
 
 
@@ -159,15 +155,25 @@ renderLoop(
         // planeRotationAxis.x = lerp(-1, -0.7, cursorTrailPosition.y.value);
 
         // Rotate around the near edge rather than the centre
-        // mat4.translate(thePlane.modelMatrix, PLANE_PIVOT);
-        // mat4.rotate(
-        //     thePlane.modelMatrix,
-        //     lerp(Math.PI/2, -1, cursorTrailPosition.y.value),
-        //     { x: -1, y: 0, z: 0 }
-        // );
-        // mat4.translate(thePlane.modelMatrix, PLANE_PIVOT_INVERSE);
+        mat4.rotate(thePlane.modelMatrix, lerp(-1.2, -0.5, cursorTrailPosition.y.value), {
+            x: 1,
+            y: 0,
+            z: 0
+        })
 
-        // mat4.scale(thePlane.modelMatrix, PLANE_SCALE);
+        mat4.rotate(thePlane.modelMatrix, lerp(-0.2, 0.2, cursorTrailPosition.x.value), {
+            x: 0,
+            y: 0,
+            z: 1
+        })
+
+         mat4.rotate(thePlane.modelMatrix, lerp(-0.5, 0, cursorTrailPosition.x.value), {
+            x: 0,
+            y: 1,
+            z: 0
+        })
+
+        mat4.scale(thePlane.modelMatrix, PLANE_SCALE);
 
         lilypad2.position.x = lilypad2position_x + Math.sin(frame.elapsed) * 0.01;
         lilypad2.position.y = lilypad2position_y + Math.sin(frame.elapsed) * 0.05;
@@ -223,7 +229,7 @@ renderLoop(
         
         
 
-        // gl.clearColor(1, 1, 1, 1);
+        gl.clearColor(1, 1, 1, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         thePlane.draw()
