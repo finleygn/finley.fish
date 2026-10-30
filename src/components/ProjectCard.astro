@@ -32,7 +32,9 @@ const p = Astro.props;
 
   img {
     width: 160px;
-    border: 1px solid var(--foreground);
+    border: 2px solid #fff;
+    border-radius: calc(var(--group-padding) - var(--group-radius));
+    box-shadow: 0px 0px 0px 1px var(--foreground);
   }
 
   li {
