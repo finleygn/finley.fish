@@ -47,7 +47,7 @@ float random(vec2 st) {
 
 float fade(vec2 c) {
   float threshold = smoothstep(0.4f, 0.5f, distance(c * vec2(1.0f, .5f), vec2(0.5f, 0.0f)));
-  return step(random(c), threshold);
+  return threshold;
 }
 
 void main() {

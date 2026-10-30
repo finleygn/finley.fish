@@ -39,22 +39,29 @@ renderLoop(
 
     mat4.identity(thePlane.modelMatrix);
     mat4.translate(thePlane.modelMatrix, PLANE_OFFSET);
-    mat4.rotate(thePlane.modelMatrix, lerp(-1.1, -0.8, mouseTracker.y), {
-      x: 1,
-      y: 0,
-      z: 0,
-    });
-    mat4.rotate(thePlane.modelMatrix, lerp(-0.2, 0.2, mouseTracker.x), {
-      x: 0,
-      y: 0,
-      z: 1,
-    });
-    mat4.rotate(thePlane.modelMatrix, lerp(-0.5, 0, mouseTracker.x), {
-      x: 0,
-      y: 1,
-      z: 0,
-    });
+    if(window.location.pathname === '/projects') {
+
+    } else {
+      
+      mat4.rotate(thePlane.modelMatrix, lerp(-1.1, -0.8, mouseTracker.y), {
+        x: 1,
+        y: 0,
+        z: 0,
+      });
+      mat4.rotate(thePlane.modelMatrix, lerp(-0.2, 0.2, mouseTracker.x), {
+        x: 0,
+        y: 0,
+        z: 1,
+      });
+      mat4.rotate(thePlane.modelMatrix, lerp(-0.5, 0, mouseTracker.x), {
+        x: 0,
+        y: 1,
+        z: 0,
+      });
+      
+    }
     mat4.scale(thePlane.modelMatrix, PLANE_SCALE);
+    
 
     for (const f of fish) {
       f.update(frame.dt);
