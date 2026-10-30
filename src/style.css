@@ -1,11 +1,11 @@
-html {
-  height: 100%;
-}
-
 body {
-  height: 100%;
+  --foreground: #444;
+  --foregroundSubtle: rgba(150, 150, calc(150 +115 * 0.2));
+
   margin: 0;
   font-family: times new roman;
+  color: var(--foreground);
+  margin-bottom: 5rem;
 }
 
 #app {
@@ -15,14 +15,36 @@ body {
   width: 100%;
   height: 100%;
   image-rendering: pixelated;
-  z-index: -1;
+  z-index: -2;
 }
 
-main {
-  margin: 120px;
-  color: rgb(0, 0, calc(255 * 0.3));
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
 }
 
-h1 {
-  font-weight: 300;
+p {
+  font-family: arial;
+}
+* {
+  box-sizing: border-box;
+}
+
+.section {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.content {
+  max-width: 650px;
+}
+
+p {
+  font-size: 0.85rem;
 }

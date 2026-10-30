@@ -1,24 +1,51 @@
 ---
-import "../style.css";
+import Layout from "../components/Layout.astro";
+import aqua from "../assets/aqua.gif";
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>finley.fish</title>
-    <meta name="description" content="software dev" />
-  </head>
+<Layout description="home">
+  <main class="section">
+    <p>Software dev from the UK.</p>
 
-  <body>
-    <main>
-      <h1>finley.fish</h1>
-      <p>welcome to my website</p>
-    </main>
-    <canvas id="app"></canvas>
-    <script>
-      import "../main";
-    </script>
-  </body>
-</html>
+    <br /><br />
+
+    <p>This website is under construction!</p>
+
+    <img src={aqua.src} />
+
+    <article>
+      <h2>links</h2><ul>
+        <li>
+          <a href="https://github.com/finleygn" target="_blank">Github</a>
+        </li><li>
+          <a href="https://twitter.com/finley_gn" target="_blank">X (Twitter)</a
+          >
+        </li><li>
+          <a href="https://linkedin.com/in/finleyg/" target="_blank">Linkedin</a
+          >
+        </li><li>
+          <a
+            href="mailto:hi@finley.fish"
+            class=""
+            data-domain="finley.fish"
+            data-user="hi">hi@finley.fish</a
+          >
+        </li><li>Discord @finleygn</li>
+      </ul>
+    </article>
+  </main>
+</Layout>
+<style>
+  h2 {
+    font-weight: 300;
+  }
+
+  article {
+    margin-top: 3rem;
+  }
+
+  img {
+    max-width: 400px;
+    width: 100%;
+  }
+</style>

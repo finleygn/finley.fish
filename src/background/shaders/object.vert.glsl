@@ -15,7 +15,7 @@ void main() {
   float circle = length(position.xy);
   // not accomodating for this in the mouse ray casting
   // because im bad at maths
-  float offset = npos.z - pow(circle, 3.0f) * 1.4f;
+  float offset = npos.z - pow(circle, 3.0f) * 1.2f;
   // float offset = npos.z;
 
   gl_Position = u_projection_matrix * u_model_matrix * vec4(npos.xy, offset, 1.0f);

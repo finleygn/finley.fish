@@ -4,8 +4,7 @@ import shaderAsciiFragment from "../shaders/ascii.frag.glsl?raw";
 import type GlobalContext from "../framework/GlobalContext";
 import { createGeometryBuffer } from "../framework/webgl";
 import { TRI_FULLSCREEN_GEOMETRY, TRI_FULLSCREEN_UV } from "../geometry";
-import Vec2 from "@fishley/wwwgraphics/math/vec2";
-import { inverseLerp } from "@fishley/wwwgraphics/math";
+import Vec2 from "@fishley/wwwgraphics/math/vec2"
 
 class AsciiProgram extends ProgramContainer {
     uniforms = {

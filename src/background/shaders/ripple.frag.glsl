@@ -42,5 +42,5 @@ void main() {
 
   mask = clamp(mask, 0.0f, 1.0f);
 
-  outColor = vec4(vec3(1.0f), mask * 0.5f);
+  outColor = vec4(vec3(1.0f), mask * 0.3f);
 }

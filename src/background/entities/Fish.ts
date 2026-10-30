@@ -9,7 +9,7 @@ abstract class FishSegment {
     static MAX_DISTANCE = 0.08;
     public direction: Vec2 = new Vec2(1, 0);
     public position: Vec2 = new Vec2(0, 0);
-    public size: number = 0.2;
+    public size: number = 0.1;
 
     abstract update(dt: number): void;
 }

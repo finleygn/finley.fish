@@ -19,6 +19,11 @@ class GlobalContext {
     this.setAsciiProjection(this.canvas.clientWidth, this.canvas.clientHeight);
     this.setPerspectiveProjection(this.canvas.clientWidth, this.canvas.clientHeight);
     this.animationEngine.tick(dt);
+
+    const width = this.canvas.clientWidth;
+    const height = this.canvas.clientHeight;
+    this.canvas.width = width * window.devicePixelRatio;
+    this.canvas.height = height * window.devicePixelRatio;
   }
 
   private setAsciiProjection(width: number, height: number) {

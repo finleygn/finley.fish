@@ -14,7 +14,7 @@ uniform float u_cell_size;
 // #define COLOUR_FOREGROUND vec3(0.1, 0.1, 0.7)
 
 // #define COLOUR_BACKGROUND vec3(0.21, 0.47, 0.26)
-#define COLOUR_FOREGROUND vec3(0., 0., 0.3)
+#define COLOUR_FOREGROUND vec3(0.4, 0.4, 0.4)
 
 // #define COLOUR_BACKGROUND vec3(0.0, 0.0, 1.0)
 // #define COLOUR_FOREGROUND vec3(1.0, 1.0, 1.0)
@@ -48,7 +48,6 @@ float random(vec2 st) {
 float fade(vec2 c) {
   float threshold = smoothstep(0.4f, 0.5f, distance(c * vec2(1.0f, .5f), vec2(0.5f, 0.0f)));
   return step(random(c), threshold);
-  // return smoothstep(0.8f, 1.0f, random(c) * );
 }
 
 void main() {

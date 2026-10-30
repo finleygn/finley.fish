@@ -1,0 +1,103 @@
+---
+import "../style.css";
+import Head from "./Head.astro";
+type Props = { title?: string; description: string };
+
+const { title, description } = Astro.props;
+---
+
+<html lang="en">
+  <Head title={title} description={description} />
+
+  <body>
+    <div id="grad"></div>
+
+    <header class="section">
+      <h1>finley garton</h1>
+      <nav>
+        <ul>
+          <li>
+            <a
+              href="/"
+              class={Astro.url.pathname === "/" ? "active" : undefined}>home</a
+            >
+          </li>
+          <li>
+            <a
+              href="/creative"
+              class={Astro.url.pathname === "/creative" ? "active" : undefined}
+              >projects</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <canvas id="app" transition:persist></canvas>
+
+    <slot />
+
+    <script>
+      import "../background/main";
+    </script>
+  </body>
+</html>
+
+<style>
+  header {
+    padding-top: min(6rem, 15vw);
+    display: flex;
+    gap: 5rem;
+    align-items: flex-end;
+    padding-bottom: 4rem;
+    z-index: 1;
+  }
+
+  nav ul {
+    list-style-type: none;
+    padding-left: 0;
+    display: flex;
+    gap: 3rem;
+    margin: 0;
+  }
+
+  nav a {
+    color: var(--foreground);
+    text-decoration: none;
+    opacity: 0.4;
+    font-size: 1.1rem;
+  }
+
+  nav a.active {
+    opacity: 1;
+  }
+
+  h1 {
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  #grad {
+    z-index: -1;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 800px;
+    max-width: 50%;
+    background: linear-gradient(to right, white 50%, transparent 100%);
+  }
+
+  @media only screen and (max-width: 600px) {
+    h1 {
+      font-size: 1.8rem;
+    }
+    header {
+      gap: 1rem;
+      justify-content: space-between;
+    }
+    nav ul {
+      gap: 1.2rem;
+    }
+  }
+</style>
