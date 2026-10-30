@@ -5,11 +5,6 @@ import type { InferEntrySchema } from "astro:content";
 import ProjectCard from "../components/ProjectCard.astro";
 
 const creative = await getCollection("creative");
-// .then((r) =>
-//   r.sort((a, b) => {
-//     return b.data.yearStart - a.data.yearStart;
-//   }),
-// );
 
 const projects = creative.map((i) => i.data);
 const yearToProjects = projects.reduce(
@@ -22,8 +17,6 @@ const yearToProjects = projects.reduce(
   },
   {} as Record<string, InferEntrySchema<"creative">[]>,
 );
-
-console.log(yearToProjects);
 
 const years = Object.keys(yearToProjects);
 const groups = years
@@ -77,6 +70,7 @@ const groups = years
       padding-left: 18px;
 
       padding-bottom: 3.5rem;
+      margin-left: -18px;
     }
 
     .year {

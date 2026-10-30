@@ -24,8 +24,8 @@ const { title, description } = Astro.props;
           </li>
           <li>
             <a
-              href="/creative"
-              class={Astro.url.pathname === "/creative" ? "active" : undefined}
+              href="/projects"
+              class={Astro.url.pathname === "/projects" ? "active" : undefined}
               >projects</a
             >
           </li>
@@ -65,7 +65,7 @@ const { title, description } = Astro.props;
     color: var(--foreground);
     text-decoration: none;
     opacity: 0.4;
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   nav a.active {
@@ -73,6 +73,7 @@ const { title, description } = Astro.props;
   }
 
   h1 {
+    font-size: 1.8rem;
     font-weight: 300;
     font-style: italic;
   }
@@ -90,7 +91,7 @@ const { title, description } = Astro.props;
 
   @media only screen and (max-width: 600px) {
     h1 {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
     }
     header {
       gap: 1rem;
@@ -98,6 +99,9 @@ const { title, description } = Astro.props;
     }
     nav ul {
       gap: 1.2rem;
+    }
+    nav a {
+      font-size: 0.9rem;
     }
   }
 </style>
