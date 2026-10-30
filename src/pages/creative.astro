@@ -1,0 +1,141 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../components/Layout.astro";
+import type { InferEntrySchema } from "astro:content";
+import ProjectCard from "../components/ProjectCard.astro";
+
+const creative = await getCollection("creative");
+// .then((r) =>
+//   r.sort((a, b) => {
+//     return b.data.yearStart - a.data.yearStart;
+//   }),
+// );
+
+const projects = creative.map((i) => i.data);
+const yearToProjects = projects.reduce(
+  (a, i) => {
+    const year = i.yearStart;
+    return {
+      ...a,
+      [year]: [...(a[year] || []), i],
+    };
+  },
+  {} as Record<string, InferEntrySchema<"creative">[]>,
+);
+
+console.log(yearToProjects);
+
+const years = Object.keys(yearToProjects);
+const groups = years
+  .map((year) => ({
+    year,
+    projects: yearToProjects[year],
+  }))
+  .sort((a, b) => Number(b.year) - Number(a.year));
+---
+
+<Layout title="creative" description="creative that i've worked on.">
+  <main class="section">
+    <div class="content">
+      <p class="description">
+        Creative work for others and my personal projects.
+      </p>
+      {
+        groups.map((group) => (
+          <div class="group">
+            <span class="year">{group.year}</span>
+
+            <ul>
+              {group.projects.map((p) => (
+                <ProjectCard {...p} />
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+      <div class="group">
+        <span class="year">2018-2024</span>
+
+        <p class="dayjobbing">
+          Mostly my day job ^-^ I have lots of either unfinished/ smaller
+          projects or OSS work on my <a
+            href="https://github.com/finleygn"
+            target="_blank">Github</a
+          >.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <style>
+    .description {
+      margin-bottom: 2rem;
+    }
+
+    .group {
+      position: relative;
+      padding-left: 18px;
+
+      padding-bottom: 3.5rem;
+    }
+
+    .year {
+      margin-left: 12px;
+      padding-left: 6px;
+      font-style: italic;
+      background: white;
+    }
+
+    .year::before {
+      content: "";
+      border-style: solid;
+      border-color: var(--foreground);
+      border-width: 1px 0px 0px 1px;
+
+      position: absolute;
+      left: 0;
+      top: 7px;
+      height: min(100%, 80px);
+      width: 37px;
+      z-index: -1;
+    }
+
+    .year::after {
+      content: "";
+      background: linear-gradient(to top, white 0%, transparent 100%);
+      width: 5px;
+      left: 0;
+      top: 8px;
+      position: absolute;
+      height: min(100%, 81px);
+    }
+
+    .dayjobbing {
+    }
+
+    h2 {
+      font-weight: 300;
+    }
+
+    ul {
+      flex: 1;
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    article {
+      margin-top: 3rem;
+    }
+
+    .dayjobbing {
+      max-width: 500px;
+      opacity: 0.8;
+      margin-top: 12px;
+    }
+  </style>
+</Layout>

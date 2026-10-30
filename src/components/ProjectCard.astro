@@ -1,0 +1,70 @@
+---
+import type { InferEntrySchema } from "astro:content";
+
+interface Props extends InferEntrySchema<"creative"> {}
+const p = Astro.props;
+---
+
+<li>
+  <img src={p.image.src} />
+
+  <div>
+    <h3>{p.title}</h3>
+    <p>{p.description}</p>
+
+    {
+      p.link && (
+        <a href={p.link} target="_blank">
+          view
+        </a>
+      )
+    }
+  </div>
+</li>
+
+<style>
+  a {
+    opacity: 0.7;
+    text-decoration: none;
+    font-family: arial;
+    font-size: 0.8rem;
+  }
+
+  img {
+    width: 160px;
+    border: 1px solid var(--foreground);
+  }
+
+  li {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  h3 {
+    font-weight: 300;
+    font-size: 1.2rem;
+  }
+
+  p {
+    color: var(--foregroundSubtle);
+    max-width: 300px;
+    margin-top: 0.5rem;
+    margin-bottom: 0.2rem;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    letter-spacing: 0.1;
+    font-family: arial;
+  }
+  span {
+    color: var(--foregroundSubtle);
+    display: block;
+  }
+
+  @media only screen and (max-width: 600px) {
+    li {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+</style>

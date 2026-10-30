@@ -1,0 +1,51 @@
+---
+import Layout from "../components/Layout.astro";
+import aqua from "../assets/aqua.gif";
+---
+
+<Layout description="home">
+  <main class="section">
+    <p>Software dev from the UK.</p>
+
+    <br /><br />
+
+    <p>This website is under construction!</p>
+
+    <img src={aqua.src} />
+
+    <article>
+      <h2>links</h2><ul>
+        <li>
+          <a href="https://github.com/finleygn" target="_blank">Github</a>
+        </li><li>
+          <a href="https://twitter.com/finley_gn" target="_blank">X (Twitter)</a
+          >
+        </li><li>
+          <a href="https://linkedin.com/in/finleyg/" target="_blank">Linkedin</a
+          >
+        </li><li>
+          <a
+            href="mailto:hi@finley.fish"
+            class=""
+            data-domain="finley.fish"
+            data-user="hi">hi@finley.fish</a
+          >
+        </li><li>Discord @finleygn</li>
+      </ul>
+    </article>
+  </main>
+</Layout>
+<style>
+  h2 {
+    font-weight: 300;
+  }
+
+  article {
+    margin-top: 3rem;
+  }
+
+  img {
+    max-width: 400px;
+    width: 100%;
+  }
+</style>

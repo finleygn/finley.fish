@@ -1,0 +1,36 @@
+[
+  {
+    "id": "depthcharge",
+    "title": "depthcharge.co",
+    "description": "My own endeavour to create a product to kill unethical dropshipping.",
+    "image": "./images/projects/depthcharge.gif",
+    "yearStart": 2026
+  },
+  {
+    "id": "tsubiclub",
+    "title": "tsubi.club",
+    "description": "Website intro sequence and shader work for a music artist & multimedia project.",
+    "image": "./images/projects/bitchclub.gif",
+    "yearStart": 2026,
+    "yearEnd": 2026,
+    "link": "https://tsubi.club"
+  },
+  {
+    "id": "rossdraws",
+    "title": "rossdraws.com",
+    "description": "Landing page of a website for an artist.",
+    "image": "./images/projects/ross.gif",
+    "yearStart": 2026,
+    "yearEnd": 2026,
+    "link": "https://rossdraws.com"
+  },
+  {
+    "id": "beanlette",
+    "title": "beanlette.net ❦",
+    "description": "A portfolio website for a digital artist.",
+    "image": "./images/projects/beanlette.gif",
+    "yearStart": 2025,
+    "yearEnd": 2025,
+    "link": "https://beanlette.net"
+  }
+]
