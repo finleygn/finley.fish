@@ -30,6 +30,7 @@ const asciiFrameBuffer = new FrameBuffer(gl, appCanvas.width, appCanvas.height);
 
 const SCALE = 2.4;
 const PLANE_OFFSET = new Vec3(0, 0, -2);
+const PLANE_OFFSET_PROEJCTS = new Vec3(0.5, 0, -2);
 const PLANE_SCALE = new Vec3(SCALE, SCALE, 1);
 
 renderLoop(
@@ -38,11 +39,21 @@ renderLoop(
     mouseTracker.update(frame.dt);
 
     mat4.identity(thePlane.modelMatrix);
-    mat4.translate(thePlane.modelMatrix, PLANE_OFFSET);
+    
     if(window.location.pathname === '/projects') {
-
+      mat4.translate(thePlane.modelMatrix, PLANE_OFFSET_PROEJCTS);
+      mat4.rotate(thePlane.modelMatrix, lerp(-0.1, 0.1, mouseTracker.y), {
+        x: 1,
+        y: 0,
+        z: 0,
+      });
+      mat4.rotate(thePlane.modelMatrix, lerp(-0.5, 0.1, mouseTracker.x), {
+        x: 0,
+        y: 1,
+        z: 0,
+      });
     } else {
-      
+      mat4.translate(thePlane.modelMatrix, PLANE_OFFSET);
       mat4.rotate(thePlane.modelMatrix, lerp(-1.1, -0.8, mouseTracker.y), {
         x: 1,
         y: 0,
