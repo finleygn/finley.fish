@@ -25,6 +25,15 @@
     "link": "https://rossdraws.com"
   },
   {
+    "id": "illusions",
+    "title": "crazyopticalillusions.net",
+    "description": "Shopify site with 3D homepage for a book launch.",
+    "image": "./images/projects/illusions.gif",
+    "yearStart": 2025,
+    "yearEnd": 2025,
+    "link": "https://crazyopticalillusions.net"
+  },
+  {
     "id": "beanlette",
     "title": "beanlette.net ❦",
     "description": "A portfolio website for beanlette.",
