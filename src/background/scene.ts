@@ -10,11 +10,16 @@ function createScene(globalContext: GlobalContext) {
 
   const lilypad1 = new Lilypad(globalContext);
   lilypad1.rotation = 0;
+  lilypad1.position.x = 0.5;
+  lilypad1.position.y = -0.2;
   lilypad1.scale.x = 0.4;
   lilypad1.scale.y = 0.4;
 
   const lilypad2 = new Lilypad(globalContext);
   lilypad2.rotation = -4;
+
+  lilypad2.position.x = -0.5;
+  lilypad2.position.y = 0.2;
   lilypad2.scale.x = 0.6;
   lilypad2.scale.y = 0.6;
 

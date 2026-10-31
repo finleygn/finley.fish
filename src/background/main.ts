@@ -11,6 +11,7 @@ import Vec3 from "@fishley/wwwgraphics/math/vec3";
 import createScene from "./scene";
 import { setupMouseClicks } from "./click";
 import mouseTracker from "./mouse";
+import { isPath } from "../lib/path";
 
 const gl = createWebGLInstance(appCanvas);
 gl.clearColor(0, 0, 0, 1);
@@ -39,8 +40,8 @@ renderLoop(
     mouseTracker.update(frame.dt);
 
     mat4.identity(thePlane.modelMatrix);
-    
-    if(window.location.pathname === '/projects') {
+
+    if(isPath(window.location.pathname, '/projects')) {
       mat4.translate(thePlane.modelMatrix, PLANE_OFFSET_PROEJCTS);
       mat4.rotate(thePlane.modelMatrix, lerp(-0.1, 0.1, mouseTracker.y), {
         x: 1,
@@ -69,10 +70,10 @@ renderLoop(
         y: 1,
         z: 0,
       });
-      
+
     }
     mat4.scale(thePlane.modelMatrix, PLANE_SCALE);
-    
+
 
     for (const f of fish) {
       f.update(frame.dt);
@@ -93,7 +94,7 @@ renderLoop(
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, texture_lilypad);
 
-    //   lilypads.forEach((p) => p.draw());
+      lilypads.forEach((p) => p.draw());
     });
 
     // draw ascii

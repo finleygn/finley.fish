@@ -1,0 +1,76 @@
+---
+import { isPath } from '../lib/path';
+---
+
+<header class="section">
+  <h1>finley garton</h1>
+  <nav>
+    <ul>
+      <li>
+        <a
+          href="/"
+          class={isPath(Astro.url.pathname, "/") ? "active" : undefined}>home</a
+        >
+      </li>
+      <li>
+        <a
+          href="/projects"
+          class={isPath(Astro.url.pathname, "/projects")  ? "active" : undefined}
+          >projects</a
+        >
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<style>
+
+header {
+  padding-top: min(6rem, 15vw);
+  display: flex;
+  gap: 5rem;
+  align-items: flex-end;
+  padding-bottom: 2rem;
+  z-index: 1;
+}
+
+nav ul {
+  list-style-type: none;
+  padding-left: 0;
+  display: flex;
+  gap: 3rem;
+  margin: 0;
+}
+
+nav a {
+  color: var(--foreground);
+  text-decoration: none;
+  opacity: 0.4;
+  font-size: 1rem;
+}
+
+nav a.active {
+  opacity: 1;
+}
+
+h1 {
+  font-size: 1.8rem;
+  font-weight: 300;
+  font-style: italic;
+}
+@media only screen and (max-width: 600px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+  header {
+    gap: 1rem;
+    justify-content: space-between;
+  }
+  nav ul {
+    gap: 1.2rem;
+  }
+  nav a {
+    font-size: 0.9rem;
+  }
+}
+</style>

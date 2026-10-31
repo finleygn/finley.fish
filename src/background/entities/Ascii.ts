@@ -67,7 +67,7 @@ class Ascii {
         program.uniforms.maskTexture.set(0);
         program.uniforms.characterTexture.set(1);
         program.uniforms.cellSize.set(
-            (resolution / 70)
+            (resolution / 60)
         )
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
