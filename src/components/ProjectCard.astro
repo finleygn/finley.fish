@@ -6,9 +6,11 @@ const p = Astro.props;
 ---
 
 <li>
-  <img src={p.image.src} />
+    <div class="image-box">
+        <img src={p.image.src} />
+    </div>
 
-  <div>
+    <div class="content">
     <h3>{p.title}</h3>
     <p>{p.description}</p>
 
@@ -31,10 +33,47 @@ const p = Astro.props;
   }
 
   img {
-    width: 160px;
-    border: 2px solid #fff;
-    border-radius: calc(var(--group-padding) - var(--group-radius));
-    box-shadow: 0px 0px 0px 1px var(--foreground);
+      width:100%;
+      z-index: -1;
+
+
+  }
+
+  .image-box {
+      position: relative;
+      aspect-ratio: 2/1;
+      z-index: 0;
+      width: 140px;
+      border: 1px solid #fff;
+      border-radius: 13px;
+      box-shadow: 0px 0px 0px 1px #ccc;
+      overflow: hidden;
+
+  }
+
+  .image-box::before {
+      content: '';
+      position: absolute;
+      border-radius: 12px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      box-shadow: inset 2px 2px 5px 6px #fff;
+      opacity: 0.5;
+  }
+
+  .image-box::after {
+      content: '';
+      position: absolute;
+      border-radius: 12px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      box-shadow: inset -2px -2px 5px 5px #000;
+      opacity: 0.8;
+      mix-blend-mode: overlay;
   }
 
   li {
@@ -45,21 +84,19 @@ const p = Astro.props;
 
   h3 {
     font-weight: 300;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 
   p {
-    color: var(--foregroundSubtle);
-    max-width: 300px;
-    margin-top: 0.5rem;
+    max-width: 40ch;
+    margin-top: 0.2rem;
     margin-bottom: 0.2rem;
-    font-size: 0.8rem;
-    opacity: 0.7;
+    font-size: 0.7rem;
     letter-spacing: 0.1;
     font-family: arial;
   }
   span {
-    color: var(--foregroundSubtle);
+    color: #888;
     display: block;
   }
 

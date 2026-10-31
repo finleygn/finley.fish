@@ -1,6 +1,8 @@
 body {
   --foreground: #444;
-  --foregroundSubtle: rgba(150, 150, calc(150 +115 * 0.2));
+  --foregroundSubtle: #888;
+  --foregroundFaint: #777;
+  --accent: #ad6903;
 
   margin: 0;
   font-family: times new roman;
@@ -24,6 +26,7 @@ h4,
 h5,
 h6,
 p {
+  color: var(--foreground);
   margin: 0;
 }
 
@@ -45,11 +48,25 @@ p {
 }
 
 p {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  color: var(--foregroundSubtle);
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+
 }
 
 @media only screen and (max-width: 600px) {
   .section {
     padding: 0 1.8rem;
   }
+}
+
+
+
+*::selection  {
+    background: var(--accent);
+    color: white;
 }
